@@ -9,6 +9,7 @@ TagManager:
   - Mutagen
   - Enemy
   - Buff
+  - DoubleTube
   layers:
   - Default
   - TransparentFX

@@ -12,13 +12,13 @@ public class TubeController : MonoBehaviour
     public Enemy enemyPrefabs;
 
     private float[] coordinates = { 0.7f, -0.7f };
-    private List<Tube> spawnTubes = new List<Tube>();
+    [SerializeField] private List<Tube> spawnTubes = new List<Tube>();
     private List<Mutagen> mutagenSpawn = new List<Mutagen>();
     public Tube startTube;
     public Mutagen mutagenStart;
 
     [Range(0, 100)]
-    public float[] oddsTube;
+    public float[] oddsTubes;
 
     [Range(0, 100)]
     public float[] oddsBaffs;
@@ -58,10 +58,11 @@ public class TubeController : MonoBehaviour
     private int randomBefore;
     private int randomAfter;
     private int randomPointBuff;
+    private int indexInList;
     public Text m_Text;
     public int numberP;
-    string message;
-    private string mutagenMod = "oneRight";
+    string message = "";
+    //private string mutagenMod = "oneRight";
     private string [] isMutagenArray = {"one", "two", "three"};
     private string isMutagen;
     private bool isMutagenTwo;
@@ -116,11 +117,16 @@ public class TubeController : MonoBehaviour
         {
             Spawn("buff");
         }
+        
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+           //TurnTunnels();
+        }
 
         switch (jump)
         {
             case 1:
-                player.Move("Up");
+               // player.Move("Up");
                 break;
             case -1:
                 Debug.Log("Down");
@@ -161,10 +167,10 @@ public class TubeController : MonoBehaviour
                     message = "Ending ";
                     break;
             }
-        }
+        } else message = "0";
 
         #endregion
-
+        
         if (spawnTubes[spawnTubes.Count - 1].End.position.z < 40)
         {
             spawnTube();
@@ -210,39 +216,32 @@ public class TubeController : MonoBehaviour
         position = Mathf.RoundToInt(mainTube.transform.eulerAngles.z / 45);
 
 
-        if (Time.time > nextActionTimeAddSpeed) //добавить скорость каждый период (period)
+        if (Time.time > nextActionTimeAddSpeed) // (period)
         {
             addSpeed += numberAddSpeed;
             nextActionTimeAddSpeed += periodAddSpeed;
         }
 
-        if (Time.time > nextActionTimeSpawnBaff) //создать бафф каждый период(period)
+        if (Time.time > nextActionTimeSpawnBaff) //(period)
         {
             periodSpawnBaff = Random.Range(5, 20);
             Spawn("buff");
             nextActionTimeSpawnBaff += periodSpawnBaff;
         }
-
-
-        switch (jump)
-        {
-            case 1:
-                player.Move("Up");
-                break;
-            case -1:
-                Debug.Log("Down");
-                break;
-        }
         jump = 0;
     }
 
     private void spawnTube()
-    {
-        Tube newTube = Instantiate(TubePrefabs[Random.Range(0, 5)]);
+    { 
+        Tube newTube = Instantiate(TubePrefabs[Mathf.RoundToInt(ChooseTunnels(oddsTubes))]);
+       /* if (newTube.CompareTag($"DoubleTube"));
+            Debug.Log("To");*/
+        newTube.GenerateBarrier();
         newTube.transform.position = spawnTubes[spawnTubes.Count - 1].Begin.position - newTube.End.localPosition;
         spawnTubes.Add(newTube);
         newTube.transform.SetParent(mainTube.transform);
         newTube.transform.rotation = mainTube.transform.rotation;
+        
     }
     private void destoryTube()
     {
@@ -297,7 +296,7 @@ public class TubeController : MonoBehaviour
                 #endregion
                 break;
             case "buff":           
-                randomPointBuff = Random.Range(0, 8);
+                randomPointBuff = Random.Range(0, 6);
                 Buff buff = Instantiate(baffs[Mathf.RoundToInt(Choose(oddsBaffs))]);
                 buff.transform.SetParent(mainTube.transform);
                 buff.transform.rotation = mainTube.transform.rotation;
@@ -361,16 +360,16 @@ public class TubeController : MonoBehaviour
                 {
                     randomTime = Random.Range(3, 9);
                     random = Random.Range(5, 10);
-                    randomPoint = Random.Range(0, 8);
+                    randomPoint = Random.Range(0, 6);
                     isMutagen = isMutagenArray[Random.Range(0, 2)];
                     if(isMutagen == "two")
                     {  
                         randomBefore = Random.Range(1, 4);
                         randomAfter = Random.Range(1, 3);
-                        randomPointTwo = Random.Range(0, 8);
+                        randomPointTwo = Random.Range(0, 6);
                         while (randomPointTwo == randomPoint)
                         {
-                            randomPointTwo = Random.Range(0, 8);
+                            randomPointTwo = Random.Range(0, 6);
                         }
                         random = Random.Range(4, 7);
                     }
@@ -404,16 +403,16 @@ public class TubeController : MonoBehaviour
                         {
                             randomTime = Random.Range(3, 9);
                             random = Random.Range(5, 10);
-                            randomPoint = Random.Range(0, 8);
+                            randomPoint = Random.Range(0, 6);
                             isMutagen = isMutagenArray[Random.Range(0, 2)];
                             if (isMutagen == "two")
                             {
                                 randomBefore = Random.Range(1, 4);
                                 randomAfter = Random.Range(1, 3);
-                                randomPointTwo = Random.Range(0, 8);
+                                randomPointTwo = Random.Range(0, 6);
                                 while (randomPointTwo == randomPoint)
                                 {
-                                    randomPointTwo = Random.Range(0, 8);
+                                    randomPointTwo = Random.Range(0, 6);
                                 }
                                 random = Random.Range(4, 7);
                             }
@@ -432,6 +431,32 @@ public class TubeController : MonoBehaviour
     }
 
     float Choose(float[] probs)
+    {
+
+        float total = 0;
+
+        foreach (float elem in probs)
+        {
+            total += elem;
+        }
+
+        float randomPoint = Random.value * total;
+
+        for (int i = 0; i < probs.Length; i++)
+        {
+            if (randomPoint < probs[i])
+            {
+                return i;
+            }
+            else
+            {
+                randomPoint -= probs[i];
+            }
+        }
+        return probs.Length - 1;
+    }
+    
+    float ChooseTunnels(float[] probs)
     {
 
         float total = 0;
