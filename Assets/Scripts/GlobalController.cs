@@ -20,10 +20,8 @@ public class GlobalController : MonoBehaviour
     {
         if (col.gameObject.CompareTag("DoubleTube"))
         {
-            Tube tube = col.gameObject.GetComponentInParent<Tube>();
-            tube.TurnTunnels();
-            //Player player = col.gameObject.GetComponent<Player>();
-            //player.tubeController.TurnTunnels();
+           // Tube tube = col.gameObject.GetComponentInParent<Tube>();
+           // tube.TurnTunnels();
         }
     }
 }

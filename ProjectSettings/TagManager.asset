@@ -10,6 +10,8 @@ TagManager:
   - Enemy
   - Buff
   - DoubleTube
+  - Target
+  - Tube
   layers:
   - Default
   - TransparentFX

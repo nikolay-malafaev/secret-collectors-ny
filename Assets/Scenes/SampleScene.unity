@@ -630,6 +630,7 @@ MonoBehaviour:
   m_Text: {fileID: 2131242159}
   numberP: 0
   baffvelocity: 0
+  IsSpawnTunnels: 0
   periodAddSpeed: 25
   periodSpawnBaff: 0
 --- !u!4 &417474719
@@ -975,13 +976,14 @@ GameObject:
   - component: {fileID: 665354484}
   - component: {fileID: 665354483}
   - component: {fileID: 665354486}
+  - component: {fileID: 665354487}
   m_Layer: 0
   m_Name: Destoyer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &665354483
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -990,10 +992,10 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 665354482}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 6, y: 6, z: 1}
+  m_Size: {x: 250, y: 50, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &665354484
 MeshFilter:
@@ -1029,6 +1031,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 298ac9e9b620a4d4992807fce7ceb97b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &665354487
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 665354482}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 250, y: 50, z: 1}
+  m_Center: {x: 0, y: 0, z: -4.11}
 --- !u!1 &714160295
 GameObject:
   m_ObjectHideFlags: 0

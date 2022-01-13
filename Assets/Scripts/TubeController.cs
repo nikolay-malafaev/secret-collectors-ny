@@ -12,7 +12,7 @@ public class TubeController : MonoBehaviour
     public Enemy enemyPrefabs;
 
     private float[] coordinates = { 0.7f, -0.7f };
-    [SerializeField] private List<Tube> spawnTubes = new List<Tube>();
+    public List<Tube> spawnTubes = new List<Tube>();
     private List<Mutagen> mutagenSpawn = new List<Mutagen>();
     public Tube startTube;
     public Mutagen mutagenStart;
@@ -68,6 +68,7 @@ public class TubeController : MonoBehaviour
     private bool isMutagenTwo;
     private bool isMutagenRotate;
     public float baffvelocity;
+    public bool IsSpawnTunnels;
 
 
     private float nextActionTimeAddSpeed = 0.0f;
@@ -78,6 +79,7 @@ public class TubeController : MonoBehaviour
 
     void Start()
     {
+        IsSpawnTunnels = true;
         schemeNumber = 1;
         addSpeed = 0.1f;
         spawnTubes.Add(startTube);
@@ -171,12 +173,12 @@ public class TubeController : MonoBehaviour
 
         #endregion
         
-        if (spawnTubes[spawnTubes.Count - 1].End.position.z < 40)
+        if (spawnTubes[spawnTubes.Count - 1].End.position.z < 40 & IsSpawnTunnels)
         {
             spawnTube();
         }
 
-        if (spawnTubes.Count > 10)
+        if (spawnTubes.Count > 20)
         {
             destoryTube();
         }
@@ -231,7 +233,7 @@ public class TubeController : MonoBehaviour
         jump = 0;
     }
 
-    private void spawnTube()
+    public void spawnTube()
     { 
         Tube newTube = Instantiate(TubePrefabs[Mathf.RoundToInt(ChooseTunnels(oddsTubes))]);
        /* if (newTube.CompareTag($"DoubleTube"));
@@ -310,6 +312,11 @@ public class TubeController : MonoBehaviour
         }
     }
 
+    public void Tubes()
+    {
+        Debug.Log("OK");
+    }
+    
     private float EulerRotate(float LastCoordination)
     {
         LastCoordination = mutagenSpawn[mutagenSpawn.Count - 1].transform.rotation.z + number;
