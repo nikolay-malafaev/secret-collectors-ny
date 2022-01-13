@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7642811816478881986}
   m_Layer: 0
   m_Name: Chunk4
-  m_TagString: Untagged
+  m_TagString: Tube
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -49,10 +49,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Begin: {fileID: 8425469838471515875}
   End: {fileID: 969088831824107955}
+  NewTube: {fileID: 0}
   isGenerateBarrier: 0
   barrier: {fileID: 0}
   barrierPositionsX: []
   barrierRotationY: []
+  TubeNumberTwo: {fileID: 0}
 --- !u!1 &3312657513517706077
 GameObject:
   m_ObjectHideFlags: 0

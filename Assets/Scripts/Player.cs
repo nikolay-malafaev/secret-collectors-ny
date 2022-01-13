@@ -126,6 +126,12 @@ public class Player : MonoBehaviour
                else colMutagen++;
             Destroy(col.gameObject);
         }
+
+        if (col.gameObject.CompareTag($"Target"))
+        {
+            Tube tube = col.gameObject.GetComponentInParent<Tube>();
+            tube.TurnTunnels();
+        }
     }
     
 
