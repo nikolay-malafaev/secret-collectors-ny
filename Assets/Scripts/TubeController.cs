@@ -70,7 +70,10 @@ public class TubeController : MonoBehaviour
     public float baffvelocity;
     public bool IsSpawnTunnels;
     private bool doubleTubeSpawn;
-
+    private Vector3 verticalTargetRotation;
+    private Quaternion vetricalQuaternion;
+    private bool IsNoGravity;
+    public int eulerCorner = 0;
 
     private float nextActionTimeAddSpeed = 0.0f;
     public float periodAddSpeed = 25;
@@ -125,7 +128,8 @@ public class TubeController : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.T))
         {
-           //TurnTunnels();
+           //NoGravity();
+           //IsNoGravity = !IsNoGravity;
         }
 
         switch (jump)
@@ -191,7 +195,9 @@ public class TubeController : MonoBehaviour
             speedCorner = Mathf.Clamp(speedCorner, -6f, 6f);
             mainTube.transform.position = new Vector3(0, 0, positionTubeZ);
            // mutagens.transform.position = new Vector3(0, 0, positionTubeZ);
-            //mainTube.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
+           // mainTube.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
+           //transform.rotation = Quaternion.RotateTowards( transform.rotation, vetricalQuaternion, 250 * Time.deltaTime);
+            
            // mutagens.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
             //oneSpawnMutagen.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
             positionTubeZ = positionTubeZ - addSpeed;
@@ -257,7 +263,7 @@ public class TubeController : MonoBehaviour
         newTube.transform.position = spawnTubes[spawnTubes.Count - 1].Begin.position - newTube.End.localPosition;
         spawnTubes.Add(newTube);
         newTube.transform.SetParent(mainTube.transform);
-        //n newTube.transform.rotation = mainTube.transform.rotation;
+        newTube.transform.rotation = mainTube.transform.rotation;
         
     }
     private void destoryTube()
@@ -331,6 +337,7 @@ public class TubeController : MonoBehaviour
     {
         Debug.Log("OK");
     }
+    
     
     /*private float EulerRotate(float LastCoordination)
     {

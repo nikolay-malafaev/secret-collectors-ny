@@ -305,6 +305,7 @@ MonoBehaviour:
   gameManager: {fileID: 0}
   tubeController: {fileID: 0}
   animator: {fileID: 0}
+  Camera: {fileID: 963194225}
 --- !u!136 &3245858055191312068
 CapsuleCollider:
   m_ObjectHideFlags: 0

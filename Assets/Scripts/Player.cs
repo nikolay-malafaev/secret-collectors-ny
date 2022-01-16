@@ -22,9 +22,16 @@ public class Player : MonoBehaviour
     public GameManager gameManager;
     public TubeController tubeController;
     public Animator animator;
+    public GameObject Camera;
+    private Quaternion vetricalQuaternion;
+    private bool IsNoGravity;
+    private int eulerCorner;
+    private float yCorner;
+    public bool isNoGravityBaff;
 
     void Start()
     {
+        IsNoGravity = false;
         m_TargetPosition = new Vector3(0, -0.708f, 4.31f);
         healthPlayer = 3;
         m_IsFly = false;
@@ -44,11 +51,17 @@ public class Player : MonoBehaviour
         {
             Jump();
         }
-        
-        healthPlayer = Mathf.Clamp(healthPlayer, -1, 1);
-        if (burable || doubleMutagen)
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+           NoGravity();
+         
+        }
+
+        if (burable || doubleMutagen || isNoGravityBaff)
             StartCoroutine(TimeBuff());
+        healthPlayer = Mathf.Clamp(healthPlayer, -1, 1);
         verticalTargetPosition = m_TargetPosition;
+        if(IsNoGravity & !isNoGravityBaff) NoGravity();
 
         if (m_Jumping)
         {
@@ -64,13 +77,32 @@ public class Player : MonoBehaviour
             }
         }
         transform.position = Vector3.MoveTowards( transform.position, verticalTargetPosition, MovidPlayerSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.RotateTowards( transform.rotation, vetricalQuaternion, 250 * Time.deltaTime);
         if (System.Math.Round(transform.position.y, 1) > -0.7f) m_IsFly = true;  //-0.708
         else m_IsFly = false;
     }
-
+    
+    public void NoGravity()
+    {
+        if(!isNoGravityBaff) return;
+        IsNoGravity = !IsNoGravity;
+        if (IsNoGravity)
+        {
+            eulerCorner = 180;
+            yCorner = 1.249f;
+        }
+        else
+        {
+            eulerCorner = 0;
+            yCorner = -0.708f;
+            m_CurrentLane = 1;
+        }
+        vetricalQuaternion = Quaternion.Euler(0, 0,eulerCorner);
+        m_TargetPosition = new Vector3(0, yCorner, 4.31f);
+    }
     public void Jump()
     {
-        if(m_IsFly)  //check run plater
+        if(m_IsFly)
             return;
         
         if (!m_Jumping)
@@ -80,11 +112,10 @@ public class Player : MonoBehaviour
            m_Jumping = true;
         }
     }
-    
     public void ChangeLane(int direction)
     {
-        //if(m_IsFly)  //check run plater
-        //    return;
+        if(IsNoGravity)
+            return;
         
         int targetLane = m_CurrentLane + direction;
         if (targetLane < 0 || targetLane > 2)
@@ -92,8 +123,9 @@ public class Player : MonoBehaviour
             return;
         m_CurrentLane = targetLane;
         m_TargetPosition = new Vector3((m_CurrentLane - 1), -0.708f, 4.31f); //*trackManager.laneOffset
-        
     }
+
+    
     
     private void OnTriggerEnter(Collider col)
     {
@@ -128,11 +160,9 @@ public class Player : MonoBehaviour
         }
 
         if (col.gameObject.CompareTag($"Target"))
-            
-            
         {
-            Tube tube = col.gameObject.GetComponentInParent<Tube>();
-            tube.TurnTunnels();
+            DoubleTunnels doubleTunnels = col.gameObject.GetComponentInParent<DoubleTunnels>();
+            doubleTunnels.TurnTunnels();
         }
     }
     
@@ -142,6 +172,7 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(10f);
         doubleMutagen = false;
         burable = false;
+        isNoGravityBaff = false;
         timer = false;
     }
 }

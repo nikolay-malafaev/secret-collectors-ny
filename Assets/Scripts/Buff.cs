@@ -26,7 +26,6 @@ public class Buff : MonoBehaviour
                // player.gameManager.Pause(10);
                 player.burable = true;
                 player.timer = true;
-                Destroy(gameObject);
 
             } else if (options == Options.Blast)
             {
@@ -43,18 +42,21 @@ public class Buff : MonoBehaviour
                         }
                     }
                 }
-                Destroy(gameObject);
+                
             } else if (options == Options.DoubleMutagen)
             {
                 player = col.gameObject.GetComponent<Player>();
                 player.doubleMutagen = true;
                 player.timer = true;
-                Destroy(gameObject);
             }
             else if (options == Options.NoGravity)
             {
-                
+                player = col.gameObject.GetComponent<Player>();
+                player.NoGravity();
+                player.isNoGravityBaff = true;
+                player.timer = true;
             }
+            Destroy(gameObject);
         }
     }
 }
