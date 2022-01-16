@@ -604,14 +604,14 @@ MonoBehaviour:
   - 75
   - 30
   - 30
-  - 30
+  - 0
   - 30
   - 20
   oddsBaffs:
-  - 30
-  - 30
-  - 30
   - 5
+  - 5
+  - 5
+  - 100
   player: {fileID: 1615113725}
   mainTube: {fileID: 417474717}
   oneSpawnMutagen: {fileID: 1720802603}
@@ -634,6 +634,7 @@ MonoBehaviour:
   numberP: 0
   baffvelocity: 0
   IsSpawnTunnels: 0
+  eulerCorner: 0
   periodAddSpeed: 25
   periodSpawnBaff: 0
 --- !u!4 &417474719
@@ -2842,7 +2843,7 @@ PrefabInstance:
     - target: {fileID: 7405399254808916583, guid: 91cc3a67f8825dc44903d2369fb7d605, type: 3}
       propertyPath: tubeController
       value: 
-      objectReference: {fileID: 417474718}
+      objectReference: {fileID: 0}
     - target: {fileID: 7798703040647069844, guid: 91cc3a67f8825dc44903d2369fb7d605, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -2918,7 +2919,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6385020703424385876, guid: 514e841f5bbdbd54597e51c4a1b6d6c6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4
+      value: 4.31
       objectReference: {fileID: 0}
     - target: {fileID: 6385020703424385876, guid: 514e841f5bbdbd54597e51c4a1b6d6c6, type: 3}
       propertyPath: m_LocalRotation.w
