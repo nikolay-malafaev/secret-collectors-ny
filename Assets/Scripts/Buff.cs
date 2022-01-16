@@ -12,7 +12,8 @@ public class Buff : MonoBehaviour
     {
         Burable = 0,
         Blast = 1,
-        DoubleMutagen = 2
+        DoubleMutagen = 2,
+        NoGravity = 3
     }
 
     private void OnTriggerEnter(Collider col)
@@ -49,6 +50,10 @@ public class Buff : MonoBehaviour
                 player.doubleMutagen = true;
                 player.timer = true;
                 Destroy(gameObject);
+            }
+            else if (options == Options.NoGravity)
+            {
+                
             }
         }
     }

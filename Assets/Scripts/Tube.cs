@@ -20,6 +20,7 @@ public class Tube : MonoBehaviour
     Vector3 defoltRotation = new Vector3(0, 0, 0);
     public GameObject TubeNumberTwo;
     private TubeController tubeController;
+    public GlobalController globalController;
 
 
 
@@ -34,29 +35,33 @@ public class Tube : MonoBehaviour
     public void TurnTunnels()
     {
         tubeController = GetComponentInParent<TubeController>();
+        globalController = GetComponentInParent<GlobalController>();
+        tubeController.IsSpawnTunnels = false;
         for (int i = 0; i < tubeController.spawnTubes.Count; i++)
         {
             tubeController.spawnTubes[i].transform.SetParent(transform);
         }
+        tubeController.mutagens.transform.SetParent(transform);
         TubeNumberTwo.SetActive(false);
         verticalTargetRotation = new Vector3(-0.5f, 0, 0);
-        transform.position = new Vector3(0.41f, 0, transform.position.z);
         verticalTargetPosition = new Vector3(0.375f, 0, 0);
-        
-        tubeController.IsSpawnTunnels = false;
         StartCoroutine(FreeSpawnTube());
     }
 
     IEnumerator FreeSpawnTube()
     {
+        yield return new WaitForSeconds(0.71f);
+        //globalController.TurnTunnels();
+        transform.position = new Vector3(0.41f, 0, transform.position.z);
         yield return new WaitForSeconds(1.15f);
-        //NewTube.transform.SetParent(tubeController.transform);
         tubeController.spawnTubes[tubeController.spawnTubes.Count - 1] = NewTube;
-        tubeController.IsSpawnTunnels = true;
         for (int i = 0; i < tubeController.spawnTubes.Count; i++)
         {
             tubeController.spawnTubes[i].transform.SetParent(tubeController.transform);
+            
         }
+        tubeController.mutagens.transform.SetParent(tubeController.transform);
+        tubeController.IsSpawnTunnels = true;
     }
     
     public void GenerateBarrier()
