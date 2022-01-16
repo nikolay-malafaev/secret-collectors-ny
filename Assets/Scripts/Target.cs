@@ -11,7 +11,8 @@ public class Target : MonoBehaviour
         if (col.gameObject.CompareTag("Player"))
         {
             //col.gameObject.
-            Player player = col.gameObject.GetComponent<Player>();
+            //Player player = col.gameObject.GetComponent<Player>();
+            gameObject.SetActive(false);
             //player.tubeController.TurnTunnels();
         }
     }

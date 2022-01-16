@@ -293,13 +293,14 @@ MonoBehaviour:
   healthPlayer: 1
   colMutagen: 0
   m_CurrentLane: 1
-  MovidPlayerSpeed: 7
-  jumpLength: 7
+  MovidPlayerSpeed: 5
+  jumpLength: 8
   burable: 0
   blastScreen: 0
   doubleMutagen: 0
   timer: 0
   m_Jumping: 0
+  m_IsFly: 0
   m_TargetPosition: {x: 0, y: 0, z: 0}
   gameManager: {fileID: 0}
   tubeController: {fileID: 0}

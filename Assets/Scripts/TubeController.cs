@@ -69,6 +69,7 @@ public class TubeController : MonoBehaviour
     private bool isMutagenRotate;
     public float baffvelocity;
     public bool IsSpawnTunnels;
+    private bool doubleTubeSpawn;
 
 
     private float nextActionTimeAddSpeed = 0.0f;
@@ -80,11 +81,13 @@ public class TubeController : MonoBehaviour
     void Start()
     {
         IsSpawnTunnels = true;
+        doubleTubeSpawn = false;
         schemeNumber = 1;
         addSpeed = 0.1f;
         spawnTubes.Add(startTube);
         periodSpawnBaff = Random.Range(13, 25);
         StartCoroutine(MutagenSpawn());
+        StartCoroutine(DoudleTubeSpawn());
         mutagenSpawn.Add(mutagenStart);
         random = Random.Range(3, 7);
         isMutagen = "one";
@@ -187,10 +190,10 @@ public class TubeController : MonoBehaviour
             speedCorner = -speedCorner;
             speedCorner = Mathf.Clamp(speedCorner, -6f, 6f);
             mainTube.transform.position = new Vector3(0, 0, positionTubeZ);
-            mutagens.transform.position = new Vector3(0, 0, positionTubeZ);
-            mainTube.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
-            mutagens.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
-            oneSpawnMutagen.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
+           // mutagens.transform.position = new Vector3(0, 0, positionTubeZ);
+            //mainTube.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
+           // mutagens.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
+            //oneSpawnMutagen.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
             positionTubeZ = positionTubeZ - addSpeed;
         }
 
@@ -215,7 +218,7 @@ public class TubeController : MonoBehaviour
         }
 
 
-        position = Mathf.RoundToInt(mainTube.transform.eulerAngles.z / 45);
+       // position = Mathf.RoundToInt(mainTube.transform.eulerAngles.z / 45);
 
 
         if (Time.time > nextActionTimeAddSpeed) // (period)
@@ -234,15 +237,27 @@ public class TubeController : MonoBehaviour
     }
 
     public void spawnTube()
-    { 
-        Tube newTube = Instantiate(TubePrefabs[Mathf.RoundToInt(ChooseTunnels(oddsTubes))]);
+    {
+        int choose;
+        while (true)
+        { 
+            choose = Mathf.RoundToInt(ChooseTunnels(oddsTubes));
+           if(choose != 5) break;
+           else if (doubleTubeSpawn)
+           {
+               StartCoroutine(DoudleTubeSpawn());
+               doubleTubeSpawn = false;
+               break;
+           }
+        }
+        Tube newTube = Instantiate(TubePrefabs[choose]);
        /* if (newTube.CompareTag($"DoubleTube"));
             Debug.Log("To");*/
         newTube.GenerateBarrier();
         newTube.transform.position = spawnTubes[spawnTubes.Count - 1].Begin.position - newTube.End.localPosition;
         spawnTubes.Add(newTube);
         newTube.transform.SetParent(mainTube.transform);
-        newTube.transform.rotation = mainTube.transform.rotation;
+        //n newTube.transform.rotation = mainTube.transform.rotation;
         
     }
     private void destoryTube()
@@ -268,45 +283,45 @@ public class TubeController : MonoBehaviour
                     newMutagenTwo.transform.SetParent(mutagens.transform);
                   }
 
-                #region Archive
-                /* Mutagen newMutagen = Instantiate(mutagenPrefabs);
-                 newMutagen.transform.position = mutagenSpawn[mutagenSpawn.Count - 1].Begin.position - newMutagen.End.localPosition;
-                 mutagenSpawn.Add(newMutagen);
-                 //newMutagen.transform.SetParent(mainTube.transform);
-                 newMutagen.transform.SetParent(mainMutagen.transform);
-                 newMutagen.transform.rotation = mainTube.transform.rotation;
-                 //newMutagen.transform.Rotate(0, 0, EulerRotate(mutagenSpawn[mutagenSpawn.Count - 1].transform.rotation.z));
-                 mutagenSpawn[mutagenSpawn.Count - 2].transform.SetParent(mainTube.transform);*/
-                /*switch (mutagenMod)
-                {
-                    case "oneRight":
-                        eulerMutagen += 15;
-                        mainMutagen.transform.rotation = Quaternion.Euler(0, 0, eulerMutagen);
-                        break;
+                  #region Archive
+                  /* Mutagen newMutagen = Instantiate(mutagenPrefabs);
+                   newMutagen.transform.position = mutagenSpawn[mutagenSpawn.Count - 1].Begin.position - newMutagen.End.localPosition;
+                   mutagenSpawn.Add(newMutagen);
+                   //newMutagen.transform.SetParent(mainTube.transform);
+                   newMutagen.transform.SetParent(mainMutagen.transform);
+                   newMutagen.transform.rotation = mainTube.transform.rotation;
+                   //newMutagen.transform.Rotate(0, 0, EulerRotate(mutagenSpawn[mutagenSpawn.Count - 1].transform.rotation.z));
+                   mutagenSpawn[mutagenSpawn.Count - 2].transform.SetParent(mainTube.transform);*/
+                  /*switch (mutagenMod)
+                  {
+                      case "oneRight":
+                          eulerMutagen += 15;
+                          mainMutagen.transform.rotation = Quaternion.Euler(0, 0, eulerMutagen);
+                          break;
+  
+                      case "oneLeft":
+                          eulerMutagen -= 15;
+                          mainMutagen.transform.rotation = Quaternion.Euler(0, 0, eulerMutagen);
+                          break;
+                  }*/
 
-                    case "oneLeft":
-                        eulerMutagen -= 15;
-                        mainMutagen.transform.rotation = Quaternion.Euler(0, 0, eulerMutagen);
-                        break;
-                }*/
-
-                /*if (random > 0)
-                {
-                    Spawn("mutagen");
-                    random--;
-                }*/
-                #endregion
-                break;
+                  /*if (random > 0)
+                  {
+                      Spawn("mutagen");
+                      random--;
+                  }*/
+                  #endregion
+                  break;
             case "buff":           
                 randomPointBuff = Random.Range(0, 6);
                 Buff buff = Instantiate(baffs[Mathf.RoundToInt(Choose(oddsBaffs))]);
-                buff.transform.SetParent(mainTube.transform);
-                buff.transform.rotation = mainTube.transform.rotation;
+                buff.transform.SetParent(mutagens.transform);
+                //buff.transform.rotation = mainTube.transform.rotation;
                 buff.transform.position = oneSpawnMutagen.transform.GetChild(randomPointBuff).position;
                 break;
             case "enemy":
                 Enemy enemy = Instantiate(enemyPrefabs);
-                enemy.transform.SetParent(mainTube.transform);
+                //enemy.transform.SetParent(mainTube.transform);
                 enemy.transform.position = new Vector3(0, -0.7f, 25);
                 break;
         }
@@ -317,7 +332,7 @@ public class TubeController : MonoBehaviour
         Debug.Log("OK");
     }
     
-    private float EulerRotate(float LastCoordination)
+    /*private float EulerRotate(float LastCoordination)
     {
         LastCoordination = mutagenSpawn[mutagenSpawn.Count - 1].transform.rotation.z + number;
         countCoin++;
@@ -349,7 +364,7 @@ public class TubeController : MonoBehaviour
         }
         if (number == 360) number = 0;
         return LastCoordination;
-    }
+    }*/
 
     IEnumerator MutagenSpawn()
     {
@@ -365,7 +380,7 @@ public class TubeController : MonoBehaviour
                 }
                 else
                 {
-                    randomTime = Random.Range(3, 9);
+                    randomTime = Random.Range(2, 6);
                     random = Random.Range(5, 10);
                     randomPoint = Random.Range(0, 6);
                     isMutagen = isMutagenArray[Random.Range(0, 2)];
@@ -408,7 +423,7 @@ public class TubeController : MonoBehaviour
                         }
                         else
                         {
-                            randomTime = Random.Range(3, 9);
+                            randomTime = Random.Range(2, 6);
                             random = Random.Range(5, 10);
                             randomPoint = Random.Range(0, 6);
                             isMutagen = isMutagenArray[Random.Range(0, 2)];
@@ -434,7 +449,19 @@ public class TubeController : MonoBehaviour
     IEnumerator NextMutagen()
     {   
         yield return new WaitForSeconds(randomTime);
-        StartCoroutine(MutagenSpawn());
+        if (IsSpawnTunnels)
+            StartCoroutine(MutagenSpawn());
+        else
+        {
+            randomTime = 2;
+            StartCoroutine(NextMutagen());
+        }
+    }
+
+    IEnumerator DoudleTubeSpawn()
+    {
+        yield return new WaitForSeconds(13f);
+        doubleTubeSpawn = true;
     }
 
     float Choose(float[] probs)

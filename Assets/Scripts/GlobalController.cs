@@ -4,24 +4,39 @@ using UnityEngine;
 
 public class GlobalController : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public TubeController tubeController;
     void Start()
     {
-        
+        tubeController = GetComponent<TubeController>();
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
         
     }
     
+    public void TurnTunnels()
+    {
+        for (int p = 0; p < tubeController.transform.childCount; p++)
+        {
+            if (tubeController.transform.GetChild(p).name == "Mutagens")
+            {
+                for (int i = 0; i < tubeController.transform.GetChild(p).childCount; i++)
+                {
+                    //if(tubeController.transform.GetChild(0).GetChild(i).CompareTag($"Mutagen"))
+                    Destroy(tubeController.transform.GetChild(p).GetChild(i).gameObject);
+                }
+            }
+        }
+    }
+    
+    
+    
     private void OnTriggerEnter(Collider col)
     {
         if (col.gameObject.CompareTag("DoubleTube"))
         {
-           // Tube tube = col.gameObject.GetComponentInParent<Tube>();
-           // tube.TurnTunnels();
+          
         }
     }
 }
