@@ -74,12 +74,12 @@ public class TubeController : MonoBehaviour
     private Quaternion vetricalQuaternion;
     private bool IsNoGravity;
     public int eulerCorner = 0;
-
     private float nextActionTimeAddSpeed = 0.0f;
     public float periodAddSpeed = 25;
-
     private float nextActionTimeSpawnBaff = 0.0f;
     public float periodSpawnBaff;
+
+
 
     void Start()
     {
@@ -148,38 +148,38 @@ public class TubeController : MonoBehaviour
     void FixedUpdate()
     {
         #region Touch
-      
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            switch (touch.phase)
-            { 
-                case TouchPhase.Began:
-                    startPos = touch.position;
-                    message = "Begun ";
-                    swipe = true;
-                    break;
-                case TouchPhase.Moved:  
-                    direction = touch.position - startPos;
-                    if(swipe)
-                    {
-                        if (direction.x < 0 & Mathf.Abs(direction.y) < 20) cornerRotate++; else if (direction.x > 0 & Mathf.Abs(direction.y) < 20) cornerRotate--;
-                        if (direction.y < 0 & Mathf.Abs(direction.x) < 20) m_Text.text = "down"; else if (direction.y > 0 & Mathf.Abs(direction.x) < 20) m_Text.text = "up";
-                        swipe = false;
-                    }  
-                    //speedCorner = (direction.x) / 30;
-                    //if (Mathf.Abs(speedCorner) < 0.5f) speedCorner = 0;
-                    message = "Moving ";
-                    break;
-                case TouchPhase.Ended:
-                    //speedCorner = 0;
-                    message = "Ending ";
-                    break;
-            }
-        } else message = "0";
-
-        #endregion
+        /* if (Input.touchCount > 0)
+         {
+             Touch touch = Input.GetTouch(0);
+             switch (touch.phase)
+             { 
+                 case TouchPhase.Began:
+                     startPos = touch.position;
+                     message = "Begun ";
+                     swipe = true;
+                     break;
+                 case TouchPhase.Moved:  
+                     direction = touch.position - startPos;
+                     if(swipe)
+                     {
+                         if (direction.x < 0 & Mathf.Abs(direction.y) < 20) player.ChangeLane(-1); else if (direction.x > 0 & Mathf.Abs(direction.y) < 20) player.ChangeLane(1);
+                         //if (direction.y < 0 & Mathf.Abs(direction.x) < 20) m_Text.text = "down"; else 
+                         if ((direction.y > 0 & Mathf.Abs(direction.x) < 20)) player.Jump();
+                         swipe = false;
+                     }  
+                     //speedCorner = (direction.x) / 30;
+                     //if (Mathf.Abs(speedCorner) < 0.5f) speedCorner = 0;
+                     message = "Moving ";
+                     break;
+                 case TouchPhase.Ended:
+                     //speedCorner = 0;
+                     message = "Ending ";
+                     break;
+             }
+         } else message = "0";*/
         
+        #endregion
+
         if (spawnTubes[spawnTubes.Count - 1].End.position.z < 40 & IsSpawnTunnels)
         {
             spawnTube();
@@ -224,7 +224,7 @@ public class TubeController : MonoBehaviour
         }
 
 
-       // position = Mathf.RoundToInt(mainTube.transform.eulerAngles.z / 45);
+        // position = Mathf.RoundToInt(mainTube.transform.eulerAngles.z / 45);
 
 
         if (Time.time > nextActionTimeAddSpeed) // (period)
