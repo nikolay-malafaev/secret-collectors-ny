@@ -18,6 +18,7 @@ public class UI : MonoBehaviour
     public GameObject gameoverText;
     public GameObject timerImage;
     public GameObject doubleMutagenImage;
+    public GameObject NoGravityButton;
     public Image timeBaff;
 
     public Animator animator;
@@ -59,7 +60,9 @@ public class UI : MonoBehaviour
 
         if (player.blastScreen)
             { animator.SetTrigger("blast"); player.blastScreen = false; }
-
+        
+        if(player.isNoGravityBaff) NoGravityButton.SetActive(true);
+        else NoGravityButton.SetActive(false);
         if (player.doubleMutagen)
         {
             doubleMutagenImage.SetActive(true);

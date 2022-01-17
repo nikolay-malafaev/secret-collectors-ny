@@ -52,7 +52,7 @@ public class Buff : MonoBehaviour
             else if (options == Options.NoGravity)
             {
                 player = col.gameObject.GetComponent<Player>();
-                player.NoGravity();
+                //player.NoGravity();
                 player.isNoGravityBaff = true;
                 player.timer = true;
             }
