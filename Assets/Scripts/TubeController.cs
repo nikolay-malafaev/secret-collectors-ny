@@ -78,11 +78,13 @@ public class TubeController : MonoBehaviour
     public float periodAddSpeed = 25;
     private float nextActionTimeSpawnBaff = 0.0f;
     public float periodSpawnBaff;
+    [HideInInspector] public PaulsController paulsController;
 
 
 
     void Start()
     {
+        paulsController = GetComponentInChildren<PaulsController>();
         IsSpawnTunnels = true;
         doubleTubeSpawn = false;
         schemeNumber = 1;
@@ -98,25 +100,6 @@ public class TubeController : MonoBehaviour
 
     private void Update()
     {
-       
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            cornerRotate++;
-
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            cornerRotate--;
-        }
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            jump = 1;
-        }
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            jump = -1;
-        }
-
         if (Input.GetKeyDown(KeyCode.M))
         {
             Spawn("mutagen");
@@ -125,13 +108,6 @@ public class TubeController : MonoBehaviour
         {
             Spawn("buff");
         }
-        
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-           //NoGravity();
-           //IsNoGravity = !IsNoGravity;
-        }
-
         switch (jump)
         {
             case 1:
@@ -142,7 +118,6 @@ public class TubeController : MonoBehaviour
                 break;
         }
         jump = 0;
-        //Debug.Log(Time.timeScale);
     }
 
     void FixedUpdate()

@@ -7,7 +7,8 @@ public class PaulsController : MonoBehaviour
 {
     public Paul[] PaulPrefabs; 
     public Paul StartPaul;
-    private List<Paul> spawnPauls = new List<Paul>();
+    [HideInInspector] public List<Paul> spawnPauls = new List<Paul>();
+    public TubeController tubeController;
    
     [Range(0, 100)]
     public float[] oddsPaul;
@@ -19,7 +20,7 @@ public class PaulsController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (spawnPauls[spawnPauls.Count - 1].End.position.z < 55)
+        if (spawnPauls[spawnPauls.Count - 1].End.position.z < 55 & tubeController.IsSpawnTunnels)
         {
             SpawnPauls();
         }

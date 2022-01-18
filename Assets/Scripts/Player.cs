@@ -124,13 +124,13 @@ public class Player : MonoBehaviour
         {
             float correctJumpLength = jumpLength * (1.0f + tubeController.numberAddSpeed);
             float ratio = (Mathf.Abs(tubeController.mainTube.transform.position.z) - m_JumpStart) / correctJumpLength;
-            if (ratio >= 0.23f)   // System.Math.Round(transform.position.y, 1)  > 0.23f
+            if (ratio >= 1.5f)   // System.Math.Round(transform.position.y, 1)  > 0.23f
             {
                 m_Jumping = false;
             }
             else
             {
-                verticalTargetPosition.y = Mathf.Sin(ratio * Mathf.PI) * 1.2f;
+                verticalTargetPosition.y = Mathf.Sin(ratio * 0.5f) * 0.4f; //* Mathf.PI
             }
         }
         transform.position = Vector3.MoveTowards( transform.position, verticalTargetPosition, MovidPlayerSpeed * Time.deltaTime);
@@ -167,6 +167,7 @@ public class Player : MonoBehaviour
         { 
             float correctJumpLength = jumpLength * (1.0f + tubeController.numberAddSpeed);
            m_JumpStart = Mathf.Abs(tubeController.mainTube.transform.position.z);
+           //m_JumpStart = (float)System.Math.Round(tubeController.mainTube.transform.position.z, 1);
            m_Jumping = true;
         }
     }
