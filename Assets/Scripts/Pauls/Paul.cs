@@ -6,5 +6,4 @@ public class Paul : MonoBehaviour
 {
     public Transform Begin;
     public Transform End;
-    
 }

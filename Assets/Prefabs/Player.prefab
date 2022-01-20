@@ -210,7 +210,7 @@ MonoBehaviour:
   colMutagen: 0
   m_CurrentLane: 1
   MovidPlayerSpeed: 4
-  jumpLength: 8
+  jumpLength: 1.5
   burable: 0
   blastScreen: 0
   doubleMutagen: 0
@@ -221,7 +221,10 @@ MonoBehaviour:
   gameManager: {fileID: 0}
   tubeController: {fileID: 0}
   animator: {fileID: 0}
-  Camera: {fileID: 0}
+  camera: {fileID: 0}
+  IsNoGravity: 0
+  eulerCorner: 0
+  yCorner: 0
   isNoGravityBaff: 0
 --- !u!136 &3245858055191312068
 CapsuleCollider:

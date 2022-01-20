@@ -12,6 +12,8 @@ TagManager:
   - DoubleTube
   - Target
   - Tube
+  - Camera
+  - PaulHole
   layers:
   - Default
   - TransparentFX

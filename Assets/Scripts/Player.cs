@@ -22,11 +22,11 @@ public class Player : MonoBehaviour
     public GameManager gameManager;
     public TubeController tubeController;
     public Animator animator;
-    public GameObject Camera;
+    public CameraController camera;
     private Quaternion vetricalQuaternion;
-    private bool IsNoGravity;
-    private int eulerCorner;
-    private float yCorner;
+    [HideInInspector] public bool IsNoGravity;
+    [HideInInspector] public int eulerCorner;
+    [HideInInspector] public float yCorner;
     public bool isNoGravityBaff;
     
     private bool m_IsSwiping = false;
@@ -222,6 +222,11 @@ public class Player : MonoBehaviour
         {
             DoubleTunnels doubleTunnels = col.gameObject.GetComponentInParent<DoubleTunnels>();
             doubleTunnels.TurnTunnels();
+        }
+
+        if (col.gameObject.CompareTag($"PaulHole"))
+        {
+            camera.MoveHole();
         }
     }
     

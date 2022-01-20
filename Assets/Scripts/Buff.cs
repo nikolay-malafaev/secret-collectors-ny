@@ -20,16 +20,15 @@ public class Buff : MonoBehaviour
     {
         if (col.gameObject.CompareTag("Player"))
         {
+            player = col.gameObject.GetComponent<Player>();
             if (options == Options.Burable)
             {
-                player = col.gameObject.GetComponent<Player>();
-               // player.gameManager.Pause(10);
+                //player.gameManager.Pause(10);
                 player.burable = true;
                 player.timer = true;
 
             } else if (options == Options.Blast)
             {
-                player = col.gameObject.GetComponent<Player>();
                 player.blastScreen = true;
                 for (int i = 0; i < player.tubeController.transform.childCount; i++)
                 {
@@ -42,17 +41,13 @@ public class Buff : MonoBehaviour
                         }
                     }
                 }
-                
             } else if (options == Options.DoubleMutagen)
             {
-                player = col.gameObject.GetComponent<Player>();
                 player.doubleMutagen = true;
                 player.timer = true;
             }
             else if (options == Options.NoGravity)
             {
-                player = col.gameObject.GetComponent<Player>();
-                //player.NoGravity();
                 player.isNoGravityBaff = true;
                 player.timer = true;
             }

@@ -364,16 +364,16 @@ public class TubeController : MonoBehaviour
                 {
                     randomTime = Random.Range(2, 6);
                     random = Random.Range(5, 10);
-                    randomPoint = Random.Range(0, 6);
+                    randomPoint = Random.Range(0, 3);
                     isMutagen = isMutagenArray[Random.Range(0, 2)];
                     if(isMutagen == "two")
                     {  
                         randomBefore = Random.Range(1, 4);
                         randomAfter = Random.Range(1, 3);
-                        randomPointTwo = Random.Range(0, 6);
+                        randomPointTwo = Random.Range(0, 3);
                         while (randomPointTwo == randomPoint)
                         {
-                            randomPointTwo = Random.Range(0, 6);
+                            randomPointTwo = Random.Range(0, 3);
                         }
                         random = Random.Range(4, 7);
                     }
@@ -407,16 +407,16 @@ public class TubeController : MonoBehaviour
                         {
                             randomTime = Random.Range(2, 6);
                             random = Random.Range(5, 10);
-                            randomPoint = Random.Range(0, 6);
+                            randomPoint = Random.Range(0, 3);
                             isMutagen = isMutagenArray[Random.Range(0, 2)];
                             if (isMutagen == "two")
                             {
                                 randomBefore = Random.Range(1, 4);
                                 randomAfter = Random.Range(1, 3);
-                                randomPointTwo = Random.Range(0, 6);
+                                randomPointTwo = Random.Range(0, 3);
                                 while (randomPointTwo == randomPoint)
                                 {
-                                    randomPointTwo = Random.Range(0, 6);
+                                    randomPointTwo = Random.Range(0, 3);
                                 }
                                 random = Random.Range(4, 7);
                             }
