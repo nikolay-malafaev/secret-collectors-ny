@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
+    [SerializeField] private bool isChit;
     public int healthPlayer;
     public int colMutagen;
     public int m_CurrentLane;
@@ -27,13 +29,16 @@ public class Player : MonoBehaviour
     [HideInInspector] public bool IsNoGravity;
     [HideInInspector] public int eulerCorner;
     [HideInInspector] public float yCorner;
-    public bool isNoGravityBaff;
+    [HideInInspector] public bool isNoGravityBaff;
+    private float positionY;
     
     private bool m_IsSwiping = false;
     private Vector2 m_StartingTouch;
+    private float lastMovidPlayerSpeed;
 
     void Start()
     {
+        lastMovidPlayerSpeed = MovidPlayerSpeed;
         IsNoGravity = false;
         m_TargetPosition = new Vector3(0, -0.708f, 4.31f);
         healthPlayer = 3;
@@ -139,6 +144,7 @@ public class Player : MonoBehaviour
         else m_IsFly = false;
     }
     
+
     public void NoGravity()
     {
         if(!isNoGravityBaff) return;
@@ -188,7 +194,13 @@ public class Player : MonoBehaviour
     
     private void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.CompareTag("Barrier"))
+        if (col.gameObject.CompareTag("Track"))
+        {
+           // positionY = -0.708f;
+           Debug.Log("Pos");
+        }
+        
+        if (col.gameObject.CompareTag("Barrier") & !isChit)
         {
             if (!burable)
                 healthPlayer--;
@@ -228,6 +240,19 @@ public class Player : MonoBehaviour
         {
             camera.MoveHole();
         }
+        
+        if (col.gameObject.CompareTag("Rise"))
+        {
+            StartCoroutine(MovedPlayerSpeed());
+            m_TargetPosition = new Vector3(transform.position.x, -0.32f, 4.31f);
+            
+        }
+        
+        if (col.gameObject.CompareTag("UndRise"))
+        {
+            StartCoroutine(MovedPlayerSpeed());
+            m_TargetPosition = new Vector3(transform.position.x, -0.708f, 4.31f);
+        }
     }
     
 
@@ -243,4 +268,13 @@ public class Player : MonoBehaviour
             isNoGravityBaff = false;
         }
     }
+
+    IEnumerator MovedPlayerSpeed()
+    {
+        MovidPlayerSpeed = 1.5f;
+        yield return new WaitForSeconds(0.2f);
+        Debug.Log("Stop");
+        MovidPlayerSpeed = lastMovidPlayerSpeed;
+    }
+
 }

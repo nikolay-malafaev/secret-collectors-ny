@@ -6,4 +6,5 @@ public class Paul : MonoBehaviour
 {
     public Transform Begin;
     public Transform End;
+    public Transform[] NumberBarriers; // Center, Right, Left
 }
