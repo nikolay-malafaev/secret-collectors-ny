@@ -91,7 +91,7 @@ public class TubeController : MonoBehaviour
         addSpeed = 0.1f;
         spawnTubes.Add(startTube);
         periodSpawnBaff = Random.Range(13, 25);
-        StartCoroutine(MutagenSpawn());
+        //StartCoroutine(MutagenSpawn());
         StartCoroutine(DoudleTubeSpawn());
         mutagenSpawn.Add(mutagenStart);
         random = Random.Range(3, 7);
@@ -102,11 +102,11 @@ public class TubeController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.M))
         {
-            Spawn("mutagen");
+           // Spawn("mutagen");
         }
         if (Input.GetKeyDown(KeyCode.B))
         {
-            Spawn("buff");
+           // Spawn("buff");
         }
         switch (jump)
         {
@@ -211,7 +211,7 @@ public class TubeController : MonoBehaviour
         if (Time.time > nextActionTimeSpawnBaff) //(period)
         {
             periodSpawnBaff = Random.Range(5, 20);
-            Spawn("buff");
+            //Spawn("buff");
             nextActionTimeSpawnBaff += periodSpawnBaff;
         }
         jump = 0;

@@ -14,6 +14,9 @@ TagManager:
   - Tube
   - Camera
   - PaulHole
+  - Rise
+  - UndRise
+  - Track
   layers:
   - Default
   - TransparentFX
