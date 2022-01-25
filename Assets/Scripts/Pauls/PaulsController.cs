@@ -17,7 +17,7 @@ public class PaulsController : MonoBehaviour
 
     [Range(0, 100)] public float[] oddsBarriers;
     private int countPauls;
-    private int countPaulsTwo;
+    private int[] positionRoad = new []{0, 0, 0};
     private bool roadCreativ;
     private int numberPositionInRoad;
     private bool newRoad;
@@ -26,7 +26,6 @@ public class PaulsController : MonoBehaviour
 
     private void Start()
     {
-        countPaulsTwo = 0;
         countPaulsBetween = new int[BarriersPrefabs.Length];
         for (int i = 0; i < BarriersPrefabs.Length; i++)
         {
@@ -69,7 +68,7 @@ public class PaulsController : MonoBehaviour
         Paul newPaul = Instantiate(Pauls[1], transform, true);
         newPaul.transform.position = spawnPauls[spawnPauls.Count - 1].Begin.position - newPaul.End.localPosition;
         spawnPauls.Add(newPaul);
-        newPaul.transform.rotation = transform.rotation;
+        //newPaul.transform.rotation = transform.rotation;
 
         if (countPauls == 0)
         {
@@ -137,7 +136,7 @@ public class PaulsController : MonoBehaviour
 
         
         
-        if (roadCreativ)
+        /*if (roadCreativ)
         {
             Road road;
             if (lengthRoad == currentLegthRoad)
@@ -161,7 +160,7 @@ public class PaulsController : MonoBehaviour
                                       new Vector3(0f, 0.3f, 0);
             lengthRoad--;
             if (lengthRoad == 0) roadCreativ = false;
-        }
+        }*/
     }
 
     private void DestoryPauls()
@@ -170,14 +169,14 @@ public class PaulsController : MonoBehaviour
         spawnPauls.RemoveAt(0);
     }
 
-    private int PaulGenerator()
+    public int PaulGenerator()
     {
         int paulNumber;
         paulNumber = Mathf.RoundToInt(Choose(oddsBarriers));
         return paulNumber;
     }
 
-    private int PaulGenerator(int unwanted)
+    public int PaulGenerator(int unwanted)
     {
         int paulNumber;
         int counter = 0;
@@ -196,8 +195,9 @@ public class PaulsController : MonoBehaviour
         return paulNumber;
     }
 
-    private int PositionGenerator(int unwanted)
+    public int PositionGenerator(int unwanted)
     {
+        
         int numberPosition;
         int couner = 0;
         while (true)
@@ -218,6 +218,7 @@ public class PaulsController : MonoBehaviour
     private void RoadGenerator()
     {
         lengthRoad = Random.Range(10, 25);
+        
         currentLegthRoad = lengthRoad;
         int[] position = new []{1, 2};
         numberPositionInRoad = position[Random.Range(0, 2)];
