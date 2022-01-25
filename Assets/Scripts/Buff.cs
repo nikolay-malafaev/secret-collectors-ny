@@ -23,14 +23,14 @@ public class Buff : MonoBehaviour
             player = col.gameObject.GetComponent<Player>();
             if (options == Options.Burable)
             {
-                //player.gameManager.Pause(10);
+                player.gameManager.BuffsTriggers("burable");
                 player.burable = true;
                 player.timer = true;
 
             } else if (options == Options.Blast)
             {
                 player.blastScreen = true;
-                for (int i = 0; i < player.tubeController.transform.childCount; i++)
+                /*for (int i = 0; i < player.tubeController.transform.childCount; i++)
                 {
                     if (player.tubeController.transform.GetChild(i).childCount > 2)
                     {
@@ -40,9 +40,10 @@ public class Buff : MonoBehaviour
                                    Destroy(player.tubeController.transform.GetChild(i).GetChild(0).GetChild(0).gameObject); 
                         }
                     }
-                }
+                }*/
             } else if (options == Options.DoubleMutagen)
             {
+                //player.UI.BuffsTriggers("DoubleMutagen");
                 player.doubleMutagen = true;
                 player.timer = true;
             }

@@ -11,7 +11,6 @@ public class DoubleTunnels : MonoBehaviour
     private TubeController tubeController;
     private PaulsController paulsController;
     public Tube NewTube;
-    public Paul NewPaul;
     public Paul attachingPaul; 
     public GlobalController globalController;
     private List<Paul> spawnPaulInDT = new List<Paul>();
@@ -56,10 +55,8 @@ public class DoubleTunnels : MonoBehaviour
         transform.position = new Vector3(0.41f, 0, transform.position.z); // 0.41f
         yield return new WaitForSeconds(1.15f);
         tubeController.spawnTubes[tubeController.spawnTubes.Count - 1] = NewTube;
-        //spawnPaulInDT[spawnPaulInDT.Count - 1].transform.SetParent(paulsController.transform);
-        //spawnPaulInDT[spawnPaulInDT.Count - 1].transform.Rotate(0, -90, 0);
-        NewPaul.transform.SetParent(tubeController.transform);
-        paulsController.spawnPauls[paulsController.spawnPauls.Count - 1] = NewPaul;
+        spawnPaulInDT[spawnPaulInDT.Count - 1].transform.SetParent(paulsController.transform);
+        paulsController.spawnPauls[paulsController.spawnPauls.Count - 1] = spawnPaulInDT[spawnPaulInDT.Count - 1];
         for (int i = 0; i < tubeController.spawnTubes.Count; i++)
         {
             tubeController.spawnTubes[i].transform.SetParent(tubeController.transform);
@@ -104,12 +101,12 @@ public class DoubleTunnels : MonoBehaviour
                         var rotationBarrier = barrier.transform.rotation;
                         barrier.transform.Rotate(rotationBarrier.x, rotationBarrier.x + 90, rotationBarrier.z);
                         if (barrier.sameTypeDistation != 0) countPaulsBetween[paulNumber] = barrier.sameTypeDistation;
-                        if ((barrier.oneCountBarriers & p > 0))
+                        if (barrier.oneCountBarriers )
                         {
                             Destroy(barrier.gameObject);
-                            break;
+                            continue;
                         }
-
+                        
                         offset = barrier.offsetBarrier;
                         switch (barrier.possible)
                         {

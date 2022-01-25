@@ -1,94 +1,92 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UI : MonoBehaviour
 {
-    public Player player;
-    public TubeController tubeController;
-
-    public Text distation;
-    public Text maxDistation;
-    public Text Mutagen;
-    public GameObject panel;
-    public GameObject pauseButton;
-    public GameObject pauseText;
-    public GameObject gameoverText;
-    public GameObject timerImage;
-    public GameObject doubleMutagenImage;
-    public GameObject NoGravityButton;
-    public Image timeBaff;
+    [SerializeField] private Player player;
+    [SerializeField] private TubeController tubeController;
+    [SerializeField] private GameManager gameManager; 
+    private UIObjects ui;
+    
 
     public Animator animator;
-    private float saveDist;
 
 
     void Start()
     {
-        maxDistation.text = PlayerPrefs.GetFloat("Distation").ToString();
+        ui = GetComponent<UIObjects>();
+        ui.maxDistation.text = PlayerPrefs.GetFloat($"distation").ToString();
+        ui.colMutagen.text = PlayerPrefs.GetInt($"colMutagen").ToString();
+        if(!gameManager.test) ui.Transition(false);
     }
 
-    void FixedUpdate()
+    void Update()
     {
+        ui.thisDistation.text = Mathf.Round(Mathf.Abs(tubeController.positionTubeZ)).ToString();
+        ui.thisColMutagen.text = player.colMutagen.ToString();
 
 
-        distation.text = Mathf.Round(Mathf.Abs(tubeController.positionTubeZ)).ToString();
-        Mutagen.text = player.colMutagen.ToString();
+        
 
-        if (player.healthPlayer == 0)
-        {
-                player.healthPlayer = -1;
-                gameoverText.SetActive(true);
-                pauseText.SetActive(true);
-                Pause();
-                pauseButton.SetActive(false);
-        }
+       
 
-        if (PlayerPrefs.GetFloat("Distation") < Mathf.Round(Mathf.Abs(tubeController.positionTubeZ)))
-        {
-            PlayerPrefs.SetFloat("Distation", Mathf.Round(Mathf.Abs(tubeController.positionTubeZ)));
-        }
-
-        if (player.timer)
+       /* if (player.timer)
         {
             timerImage.SetActive(true);
             animator.SetBool("timer", true);
         }
-        else { timerImage.SetActive(false); animator.SetBool("timer", false); }
+        else { timerImage.SetActive(false); animator.SetBool("timer", false); }*/
 
-        if (player.blastScreen)
-            { animator.SetTrigger("blast"); player.blastScreen = false; }
+       /* if (player.blastScreen)
+        { animator.SetTrigger("blast"); player.blastScreen = false; }*/
         
-        if(player.isNoGravityBaff) NoGravityButton.SetActive(true);
-        else NoGravityButton.SetActive(false);
-        if (player.doubleMutagen)
+        /*if(player.isNoGravityBaff) NoGravityButton.SetActive(true);
+        else NoGravityButton.SetActive(false);*/
+        
+        /*if (player.doubleMutagen)
         {
             doubleMutagenImage.SetActive(true);
-        } else doubleMutagenImage.SetActive(false);
-
-
+        } else doubleMutagenImage.SetActive(false);*/
+        
     }
-
-    public void ResetScene()
+    
+    public void BuffsUI(string nameBuff)
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        Time.timeScale = 1;
+        switch (nameBuff)
+        {
+            case "DoubleMutagen":
+                
+                break;
+        }
     }
 
-    public void Pause()
+
+    public void Pause(bool pause)
     {
-        panel.SetActive(!panel.activeInHierarchy);
-        pauseText.SetActive(!pauseText.activeInHierarchy);
-        tubeController.pausePosition = !tubeController.pausePosition;
-        player.gameManager.Pause();
+        ui.panel.SetActive(pause);
+        ui.ButtonPause.SetActive(!pause);
+        ui.TextPause.SetActive(pause);
     }
-
+    public void GameOver()
+    {
+        ui.gameover.SetActive(true);
+        ui.panel.SetActive(true);
+        ui.ButtonPause.SetActive(false);
+    }
+    public void Approval()
+    {
+        ui.Approval.SetActive(!ui.Approval.activeSelf);
+    }
     public void DeletePlayerPrefs()
     {
         PlayerPrefs.DeleteAll();
-        maxDistation.text = PlayerPrefs.GetFloat("Distation").ToString();
+    }
+    public void Transition()
+    {
+        gameManager.TransitionGame();
+        ui.Transition(gameManager.game);
     }
 
 }
