@@ -17,6 +17,7 @@ TagManager:
   - Rise
   - UndRise
   - Track
+  - UpTrack
   layers:
   - Default
   - TransparentFX
