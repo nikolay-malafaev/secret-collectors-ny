@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private bool isChit;
     [HideInInspector] public int healthPlayer;
     [HideInInspector] public int colMutagen;
     public int m_CurrentLane;
@@ -30,8 +29,10 @@ public class Player : MonoBehaviour
     [HideInInspector] public int eulerCorner;
     [HideInInspector] public float yCorner;
     [HideInInspector] public bool isNoGravityBaff;
+    public UI UI;
     private float positionY;
     private bool tabooOnMove;
+    private bool onGame;
 
     private bool m_IsSwiping = false;
     private Vector2 m_StartingTouch;
@@ -122,8 +123,11 @@ public class Player : MonoBehaviour
         }
 #endif
         m_TargetPosition = new Vector3(m_TargetPosition.x, positionY, m_TargetPosition.z);
-        if (burable || doubleMutagen || isNoGravityBaff)
-            StartCoroutine(TimeBuff());
+        
+       // if (burable || doubleMutagen || isNoGravityBaff)
+            //StartCoroutine(TimeBuff());
+        
+        
         healthPlayer = Mathf.Clamp(healthPlayer, -1, 1);
         verticalTargetPosition = m_TargetPosition;
 
@@ -144,12 +148,13 @@ public class Player : MonoBehaviour
         transform.rotation = Quaternion.RotateTowards( transform.rotation, vetricalQuaternion, 250 * Time.deltaTime);
         if (Math.Round(transform.position.y - 0.1f, 1) > positionY) m_IsFly = true;  //-0.7
         else m_IsFly = false;
+        onGame = gameManager.game;
     }
     
 
     public void NoGravity()
     {
-        if(!isNoGravityBaff || tabooOnMove) return;
+        if(!isNoGravityBaff || tabooOnMove || !onGame) return;
         
         IsNoGravity = !IsNoGravity;
         if (IsNoGravity)
@@ -168,7 +173,7 @@ public class Player : MonoBehaviour
     }
     public void Jump()
     {
-        if(m_IsFly || tabooOnMove) return;
+        if(m_IsFly || tabooOnMove || !onGame) return;
         
         if (!m_Jumping)
         { 
@@ -180,7 +185,7 @@ public class Player : MonoBehaviour
     }
     public void ChangeLane(int direction)
     {
-        if(IsNoGravity || tabooOnMove) return;
+        if(IsNoGravity || tabooOnMove || !onGame) return;
         
         int targetLane = m_CurrentLane + direction;
         if (targetLane < 0 || targetLane > 2)
@@ -207,7 +212,7 @@ public class Player : MonoBehaviour
             Debug.Log("UpPos");
         }*/
         
-        if (col.gameObject.CompareTag("Barrier") & !isChit)
+        if (col.gameObject.CompareTag("Barrier") & !gameManager.test)
         {
             if (!burable)
                 healthPlayer--;
@@ -216,7 +221,7 @@ public class Player : MonoBehaviour
                 blastScreen = true;
                 burable = false;
                 timer = false;
-                StopCoroutine(TimeBuff());
+                //StopCoroutine(TimeBuff());
                 for (int i = 0; i < tubeController.transform.childCount; i++)
                 {
                     if (tubeController.transform.GetChild(i).childCount > 2)
@@ -229,15 +234,23 @@ public class Player : MonoBehaviour
                     }
                 }
             }
-        } else if (col.gameObject.CompareTag("Barrier") & isChit)
+        } else if (col.gameObject.CompareTag("Barrier") & gameManager.test)
         {
             Debug.LogError("Game over!");
         }
         
         if(col.gameObject.CompareTag("Mutagen"))
         {
-            if(doubleMutagen) colMutagen+=2;
-               else colMutagen++;
+            if (doubleMutagen)
+            {
+                colMutagen+=2;
+                gameManager.AddMutagen(2);
+            }
+            else
+            {
+                gameManager.AddMutagen(1);
+                colMutagen++;
+            }
             Destroy(col.gameObject);
         }
 
@@ -253,20 +266,20 @@ public class Player : MonoBehaviour
             camera.MoveHole();
         }
         
-       /* if (col.gameObject.CompareTag("Rise"))
-        {
-            StartCoroutine(MovedPlayerSpeed());
-            positionY = -0.32f;
-            //m_TargetPosition = new Vector3(transform.position.x, -0.32f, 4.31f);
-
-        }
-        
-        if (col.gameObject.CompareTag("UndRise"))
-        {
-            StartCoroutine(MovedPlayerSpeed());
-            positionY = -0.708f;
-            //m_TargetPosition = new Vector3(transform.position.x, -0.708f, 4.31f);
-        }*/
+        /* if (col.gameObject.CompareTag("Rise"))
+         {
+             StartCoroutine(MovedPlayerSpeed());
+             positionY = -0.32f;
+             //m_TargetPosition = new Vector3(transform.position.x, -0.32f, 4.31f);
+ 
+         }
+         
+         if (col.gameObject.CompareTag("UndRise"))
+         {
+             StartCoroutine(MovedPlayerSpeed());
+             positionY = -0.708f;
+             //m_TargetPosition = new Vector3(transform.position.x, -0.708f, 4.31f);
+         }*/
     }
 
     private void OnTriggerExit(Collider other)
@@ -277,27 +290,13 @@ public class Player : MonoBehaviour
         }
     }
 
-
-    IEnumerator TimeBuff()
-    {
-        yield return new WaitForSeconds(10f);
-        doubleMutagen = false;
-        burable = false;
-        timer = false;
-        if (isNoGravityBaff)
-        {
-            if(IsNoGravity) NoGravity();
-            isNoGravityBaff = false;
-        }
-        
-    }
-
-    IEnumerator MovedPlayerSpeed()
+    
+    /*IEnumerator MovedPlayerSpeed()
     {
         MovidPlayerSpeed = 1.5f;
         yield return new WaitForSeconds(0.2f);
         Debug.Log("Stop");
         MovidPlayerSpeed = lastMovidPlayerSpeed;
-    }
+    }*/
 
 }

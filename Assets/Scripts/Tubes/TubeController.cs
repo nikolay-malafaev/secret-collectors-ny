@@ -98,63 +98,8 @@ public class TubeController : MonoBehaviour
         isMutagen = "one";
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-           // Spawn("mutagen");
-        }
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-           // Spawn("buff");
-        }
-        switch (jump)
-        {
-            case 1:
-               // player.Move("Up");
-                break;
-            case -1:
-                Debug.Log("Down");
-                break;
-        }
-        jump = 0;
-    }
-
     void FixedUpdate()
     {
-        #region Touch
-        /* if (Input.touchCount > 0)
-         {
-             Touch touch = Input.GetTouch(0);
-             switch (touch.phase)
-             { 
-                 case TouchPhase.Began:
-                     startPos = touch.position;
-                     message = "Begun ";
-                     swipe = true;
-                     break;
-                 case TouchPhase.Moved:  
-                     direction = touch.position - startPos;
-                     if(swipe)
-                     {
-                         if (direction.x < 0 & Mathf.Abs(direction.y) < 20) player.ChangeLane(-1); else if (direction.x > 0 & Mathf.Abs(direction.y) < 20) player.ChangeLane(1);
-                         //if (direction.y < 0 & Mathf.Abs(direction.x) < 20) m_Text.text = "down"; else 
-                         if ((direction.y > 0 & Mathf.Abs(direction.x) < 20)) player.Jump();
-                         swipe = false;
-                     }  
-                     //speedCorner = (direction.x) / 30;
-                     //if (Mathf.Abs(speedCorner) < 0.5f) speedCorner = 0;
-                     message = "Moving ";
-                     break;
-                 case TouchPhase.Ended:
-                     //speedCorner = 0;
-                     message = "Ending ";
-                     break;
-             }
-         } else message = "0";*/
-        
-        #endregion
-
         if (spawnTubes[spawnTubes.Count - 1].End.position.z < 40 & IsSpawnTunnels)
         {
             spawnTube();
@@ -169,38 +114,15 @@ public class TubeController : MonoBehaviour
             speedCorner = -speedCorner;
             speedCorner = Mathf.Clamp(speedCorner, -6f, 6f);
             mainTube.transform.position = new Vector3(0, 0, positionTubeZ);
-           // mutagens.transform.position = new Vector3(0, 0, positionTubeZ);
-           // mainTube.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
-           //transform.rotation = Quaternion.RotateTowards( transform.rotation, vetricalQuaternion, 250 * Time.deltaTime);
-            
-           // mutagens.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
-            //oneSpawnMutagen.transform.rotation = Quaternion.Euler(0, 0, corner += speedCorner);
-            positionTubeZ = positionTubeZ - addSpeed;
+            positionTubeZ -= addSpeed;
         }
-
-        if (corner == 360 | corner == -360) corner = 0;
-
+        
         if (!player.burable & velocityTimeBaff)
         {
             addSpeed = baffvelocity;
             velocityTimeBaff = false;
         }
-
-        if (cornerRotate > 0)
-            corner += 2.25f; 
-
-        if (cornerRotate < 0)
-            corner-=2.25f;
-
-        if (corner % 45 == 0)
-        {
-            if (cornerRotate > 0) cornerRotate--;
-            if (cornerRotate < 0) cornerRotate++;
-        }
-
-
-        // position = Mathf.RoundToInt(mainTube.transform.eulerAngles.z / 45);
-
+        
 
         if (Time.time > nextActionTimeAddSpeed) // (period)
         {
@@ -214,7 +136,6 @@ public class TubeController : MonoBehaviour
             Spawn("buff");
             nextActionTimeSpawnBaff += periodSpawnBaff;
         }
-        jump = 0;
     }
 
     public void spawnTube()
@@ -223,7 +144,7 @@ public class TubeController : MonoBehaviour
         while (true)
         { 
             choose = Mathf.RoundToInt(ChooseTunnels(oddsTubes));
-           if(choose != 5) break;
+           if(choose != 1) break;
            else if (doubleTubeSpawn)
            {
                StartCoroutine(DoudleTubeSpawn());
@@ -312,41 +233,6 @@ public class TubeController : MonoBehaviour
     {
         Debug.Log("OK");
     }
-    
-    
-    /*private float EulerRotate(float LastCoordination)
-    {
-        LastCoordination = mutagenSpawn[mutagenSpawn.Count - 1].transform.rotation.z + number;
-        countCoin++;
-        if (schemeNumber == 5) schemeNumber = 1;
-        if (score == 6) score = 0;
-        if(countCoin > 15)
-        {
-            schemeNumber = Random.Range(1, 5);
-            countCoin = 0;
-        }
-        switch (schemeNumber)
-        {
-            case 1:
-                number += 0;
-                break;
-            case 2:
-                number += 15;
-                break;
-            case 3:
-                number -= 15;
-                break;
-            case 4:
-                if (score < 3) number += 15;
-                if (score >= 3)  number -= 15;
-                score++;
-                break;
-            default:
-                break;
-        }
-        if (number == 360) number = 0;
-        return LastCoordination;
-    }*/
 
     IEnumerator MutagenSpawn()
     {
