@@ -12,10 +12,16 @@ public class Player : MonoBehaviour
     public float MovidPlayerSpeed;
     public float jumpLength = 6;
     private float m_JumpStart;
-    [HideInInspector] public bool burable;
-    [HideInInspector] public bool blastScreen;
-    [HideInInspector] public bool doubleMutagen;
-    [HideInInspector] public bool timer;
+
+    //Buffs
+    private bool burable;
+    private bool blastScreen;
+    private bool doubleMutagen;
+    private bool timer;
+    [HideInInspector] public bool IsNoGravity;
+
+
+
     public bool m_Jumping;
     public bool m_IsFly;
     public Vector3 m_TargetPosition;
@@ -25,7 +31,6 @@ public class Player : MonoBehaviour
     public Animator animator;
     public CameraController camera;
     private Quaternion vetricalQuaternion;
-    [HideInInspector] public bool IsNoGravity;
     [HideInInspector] public int eulerCorner;
     [HideInInspector] public float yCorner;
     [HideInInspector] public bool isNoGravityBaff;
@@ -44,7 +49,7 @@ public class Player : MonoBehaviour
         IsNoGravity = false;
         positionY = -0.708f;
         m_TargetPosition = new Vector3(0, positionY, 4.31f);
-        healthPlayer = 3;
+        healthPlayer = 1;
         m_IsFly = false;
     }
 
@@ -134,7 +139,7 @@ public class Player : MonoBehaviour
         if (m_Jumping)
         {
             float correctJumpLength = jumpLength * (1.0f + tubeController.numberAddSpeed);
-            float ratio = (Mathf.Abs(tubeController.mainTube.transform.position.z) - m_JumpStart) / correctJumpLength;
+            float ratio = (Mathf.Abs(tubeController.transform.position.z) - m_JumpStart) / correctJumpLength;
             if (ratio >= 1.5f)   // System.Math.Round(transform.position.y, 1)  > 0.23f
             {
                 m_Jumping = false;
@@ -178,7 +183,7 @@ public class Player : MonoBehaviour
         if (!m_Jumping)
         { 
             float correctJumpLength = jumpLength * (1.0f + tubeController.numberAddSpeed);
-           m_JumpStart = Mathf.Abs(tubeController.mainTube.transform.position.z);
+           m_JumpStart = Mathf.Abs(tubeController.transform.position.z);
            //m_JumpStart = (float)System.Math.Round(tubeController.mainTube.transform.position.z, 1);
            m_Jumping = true;
         }
@@ -211,61 +216,47 @@ public class Player : MonoBehaviour
             positionY = -0.32f;
             Debug.Log("UpPos");
         }*/
-        
-        if (col.gameObject.CompareTag("Barrier") & !gameManager.test)
+
+        switch (col.gameObject.tag)
         {
-            if (!burable)
-                healthPlayer--;
-            else if(burable)
-            {
-                blastScreen = true;
-                burable = false;
-                timer = false;
-                //StopCoroutine(TimeBuff());
-                for (int i = 0; i < tubeController.transform.childCount; i++)
+            case "Barrier":
+                if (!gameManager.test)
                 {
-                    if (tubeController.transform.GetChild(i).childCount > 2)
+                    if (gameManager.buffs[0])
                     {
-                        if (tubeController.transform.GetChild(i).GetChild(0).childCount > 0)
-                        {
-                            if (tubeController.transform.GetChild(i).GetChild(0).GetChild(0).CompareTag("Barrier"))
-                                Destroy(tubeController.transform.GetChild(i).GetChild(0).GetChild(0).gameObject);
-                        }
+                        gameManager.Buffs("blast", false);
                     }
+                    else healthPlayer--;
                 }
-            }
-        } else if (col.gameObject.CompareTag("Barrier") & gameManager.test)
-        {
-            Debug.LogError("Game over!");
+                else if (gameManager.test)
+                {
+                    Debug.LogError("Game over!");
+                }
+                
+                break;
+            case "Mutagen":
+                if (gameManager.buffs[1])
+                {
+                    colMutagen+=2;
+                    gameManager.AddMutagen(2);
+                }
+                else
+                {
+                    gameManager.AddMutagen(1);
+                    colMutagen++;
+                }
+                Destroy(col.gameObject);
+                break;
+            case "Target":
+                DoubleTunnels doubleTunnels = col.gameObject.GetComponentInParent<DoubleTunnels>();
+                doubleTunnels.TurnTunnels();
+                break;
+            case "PaulHole":
+                tabooOnMove = true;
+                camera.MoveHole();
+                break;
+            
         }
-        
-        if(col.gameObject.CompareTag("Mutagen"))
-        {
-            if (doubleMutagen)
-            {
-                colMutagen+=2;
-                gameManager.AddMutagen(2);
-            }
-            else
-            {
-                gameManager.AddMutagen(1);
-                colMutagen++;
-            }
-            Destroy(col.gameObject);
-        }
-
-        if (col.gameObject.CompareTag($"Target"))
-        {
-            DoubleTunnels doubleTunnels = col.gameObject.GetComponentInParent<DoubleTunnels>();
-            doubleTunnels.TurnTunnels();
-        }
-
-        if (col.gameObject.CompareTag($"PaulHole"))
-        {
-            tabooOnMove = true;
-            camera.MoveHole();
-        }
-        
         /* if (col.gameObject.CompareTag("Rise"))
          {
              StartCoroutine(MovedPlayerSpeed());

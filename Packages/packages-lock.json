@@ -84,6 +84,13 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "www.nulltale.eventsystem": {
+      "version": "https://github.com/NullTale/UnityEventBus.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "bab6e7e9816e13128146d7e021c891ed772f88d2"
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,

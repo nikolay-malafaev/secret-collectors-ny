@@ -2,28 +2,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEventBus;
 
 
 public class GameManager : MonoBehaviour
 {
-    [HideInInspector] public bool game;
     public bool test;
+    [HideInInspector] public bool game;
+    [HideInInspector] public int[] globalTimeBuff;
+    [HideInInspector] public float time;
+    
     [SerializeField] private TubeController tubeController;
+    [SerializeField] private BuffController buffController;
     [SerializeField] private Player player;
     [SerializeField] private UI UI;
+    private bool timer;
+    
     [SerializeField] private CameraController cameraController;
+    //number:       0         1          2       3
+    //type:    burable doubleMutagen blast  noGravity
+    //timer:    true      true       false    true
 
+    [HideInInspector] public bool[] buffs = new bool[4];
+    
     void Start()
     {
-        if (!test)
-        {
-            tubeController.pausePosition = true;
-        }
-        else
-        {
-            tubeController.pausePosition = false;
-            game = true;
-        }
+        buffs = new bool[4];
+        globalTimeBuff = new int[] {10, 10, 10, 10};
+        tubeController.pausePosition = !test;
+        game = test;
     }
 
     void Update()
@@ -39,8 +46,10 @@ public class GameManager : MonoBehaviour
         {
             PlayerPrefs.SetFloat($"distation", Mathf.Round(Mathf.Abs(tubeController.positionTubeZ)));
         }
-
     }
+    
+
+    
 
     public void TransitionGame()
     {
@@ -68,27 +77,52 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
     }
     
-    public void BuffsTriggers(string nameBuff)
+    public void Buffs(string nameBuff,  bool isTimer)
     {
-        UI.BuffsUI(nameBuff);
+        int numberBuff = -1;
         switch (nameBuff)
         {
             case "burable":
-                
+                numberBuff = 0;
+                break;
+            case "doubleMutagen":
+                numberBuff = 1;
+            break;
+            case "blast":
+                numberBuff = 2;
+                buffController.Blast();
+                break;
+            case "noGravity":
+                numberBuff = 3;
                 break;
         }
+        
+        buffs[numberBuff] = true;
+        if (isTimer & numberBuff > -1)
+        {
+            timer = true;
+            time = 1;
+            StartCoroutine(TimeBuff(isTimer, numberBuff));
+            //StartCoroutine(Timer(numberBuff));
+        }
+        UI.BuffsUI(isTimer, timer, numberBuff);
     }
     
-    /*IEnumerator TimeBuff()
+    IEnumerator TimeBuff(bool isTimer, int number)
     {
-        /*yield return new WaitForSeconds(10f);
-        doubleMutagen = false;
-        burable = false;
+        yield return new WaitForSeconds(globalTimeBuff[number]);
         timer = false;
-        if (isNoGravityBaff)
-        {
-            if(IsNoGravity) NoGravity();
-            isNoGravityBaff = false;
-        }
+        buffs[number] = false;
+        UI.BuffsUI(isTimer, timer, number);
+    }
+    
+    /*IEnumerator Timer(int number)
+    {
+        yield return new WaitForSeconds(globalTimeBuff[number] / 100);
+        time -= globalTimeBuff[number] / 100;
+        Debug.Log(time);
+        if(!timer) yield break;
+        StartCoroutine(Timer(number));
     }*/
 }
+

@@ -34,7 +34,7 @@ public class DoubleTunnels : MonoBehaviour
     
     public void TurnTunnels() 
     {
-        tubeController.IsSpawnTunnels = false;
+        tubeController.isSpawnTunnels = false;
         
         for (int i = 0; i < tubeController.spawnTubes.Count; i++)
         {
@@ -64,7 +64,7 @@ public class DoubleTunnels : MonoBehaviour
         }
         tubeController.mutagens.transform.SetParent(tubeController.transform);
         paulsController.transform.SetParent(tubeController.transform);
-        tubeController.IsSpawnTunnels = true;
+        tubeController.isSpawnTunnels = true;
     }
 
     private void SpawnPauls()

@@ -45,7 +45,7 @@ public class PaulsController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (spawnPauls[spawnPauls.Count - 1].End.position.z < 55 & tubeController.IsSpawnTunnels)
+        if (spawnPauls[spawnPauls.Count - 1].End.position.z < 55 & tubeController.isSpawnTunnels)
         {
             SpawnPauls();
         }

@@ -9,17 +9,23 @@ public class UI : MonoBehaviour
     [SerializeField] private TubeController tubeController;
     [SerializeField] private GameManager gameManager; 
     private UIObjects ui;
-    
-
-    public Animator animator;
+    private Animator animator;
+    [SerializeField]private bool timer;
 
 
     void Start()
     {
+        animator = GetComponent<Animator>();
         ui = GetComponent<UIObjects>();
         ui.maxDistation.text = PlayerPrefs.GetFloat($"distation").ToString();
         ui.colMutagen.text = PlayerPrefs.GetInt($"colMutagen").ToString();
-        if(!gameManager.test) ui.Transition(false);
+        if (!gameManager.test)
+        {
+            bool game = gameManager.game;
+            ui.Game.SetActive(game);
+            ui.ButtonStart.SetActive(!game);
+            ui.Menu.SetActive(!game);
+        }
     }
 
     void Update()
@@ -29,9 +35,6 @@ public class UI : MonoBehaviour
 
 
         
-
-       
-
        /* if (player.timer)
         {
             timerImage.SetActive(true);
@@ -49,15 +52,36 @@ public class UI : MonoBehaviour
         {
             doubleMutagenImage.SetActive(true);
         } else doubleMutagenImage.SetActive(false);*/
-        
-    }
-    
-    public void BuffsUI(string nameBuff)
-    {
-        switch (nameBuff)
+
+        /*if (timer)
         {
-            case "DoubleMutagen":
-                
+            ui.timerBar.fillAmount = gameManager.time;
+        }*/
+    }
+
+    public void BuffsUI(bool isTimer, bool timer, int buffNumer)
+    {
+        this.timer = timer;
+        if (isTimer)
+        {
+            ui.timerImage.SetActive(timer);
+            animator.SetBool("timer", timer);
+        }
+
+        switch (buffNumer)
+        {
+            case 0:
+                ui.burable.SetActive(timer);
+                break;
+            case 1:
+                ui.doubleMutagen.SetActive(timer);
+                break;
+            case 2:
+                animator.SetTrigger($"blast");
+                break;
+            case 3:
+                ui.noGravityButton.SetActive(timer);
+                if (!timer & player.transform.position.y > 1) player.NoGravity();
                 break;
         }
     }
@@ -83,10 +107,14 @@ public class UI : MonoBehaviour
     {
         PlayerPrefs.DeleteAll();
     }
+    
     public void Transition()
     {
         gameManager.TransitionGame();
-        ui.Transition(gameManager.game);
+        bool game = gameManager.game;
+        ui.Game.SetActive(game);
+        ui.ButtonStart.SetActive(!game);
+        ui.Menu.SetActive(!game);
     }
 
 }
