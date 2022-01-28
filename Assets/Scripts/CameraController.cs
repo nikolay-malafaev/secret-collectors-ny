@@ -8,9 +8,8 @@ public class CameraController : MonoBehaviour
     public Player player;
     private Vector3 positionCamera;
     private Vector3 verticalTargetPosition;
-    private float positionX;
-    private float positionY;
-    private float positionZ;
+    private Vector3 startPositionCamera = new Vector3(1.4f,-0.32f,3.1f);
+    private Quaternion startRotationCamera = Quaternion.Euler(4.9f, -50, 0);
     private float maxPositionX;
     [SerializeField] private float MovidCameraSpeed;
     private float RotateCameraSpeed;
@@ -22,8 +21,8 @@ public class CameraController : MonoBehaviour
     {
         if (!gameManager.test)
         {
-            transform.position = new Vector3(1.7f, -0.6f, 4);
-            transform.rotation = Quaternion.Euler(-3.8f, -80, 0);
+            transform.position = startPositionCamera;
+            transform.rotation = startRotationCamera;
             positionCamera = transform.position;
         }
         else
@@ -39,17 +38,23 @@ public class CameraController : MonoBehaviour
     {
         if (gameManager.game)
         {
-            positionCamera = new Vector3(player.transform.position.x, positionCamera.y, positionCamera.z);
-            positionCamera.x = Mathf.Clamp(positionCamera.x, -maxPositionX, maxPositionX);
+         //   positionCamera = new Vector3(player.transform.position.x, positionCamera.y, positionCamera.z);
+           // positionCamera.x = Mathf.Clamp(positionCamera.x, -maxPositionX, maxPositionX);
+                 positionCamera.x = Mathf.Clamp(Mathf.Sin((player.m_CurrentLane - 1) * 1.4f), -maxPositionX, maxPositionX);
         }
         verticalTargetPosition = positionCamera;
-        transform.position = Vector3.MoveTowards(transform.position, verticalTargetPosition, MovidCameraSpeed * Time.deltaTime);
-        transform.rotation = Quaternion.RotateTowards( transform.rotation, vetricalQuaternion, RotateCameraSpeed * Time.deltaTime);
+        if (gameManager.game)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, verticalTargetPosition,
+                MovidCameraSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, vetricalQuaternion,
+                RotateCameraSpeed * Time.deltaTime);
+        }
     }
 
     public void MoveHole()
     {
-        positionCamera.y = player.transform.position.y + 0.55f;
+        positionCamera = new Vector3(positionCamera.x , player.transform.position.y + 0.55f, 1.9f);
         maxPositionX = 0.9f;
         StartCoroutine(TimeMoveHole());
     }
@@ -59,12 +64,13 @@ public class CameraController : MonoBehaviour
         yield return new WaitForSeconds(1f);
         maxPositionX = 0.7f;
         positionCamera.y = 0.54f;
+        positionCamera.z = 1.2f;
     }
 
     public void ToGame()
     {
         vetricalQuaternion = Quaternion.Euler(6.3f,0,0);
         positionCamera = new Vector3(0, 0.54f, 1.2f);
-        RotateCameraSpeed = 100;
+        RotateCameraSpeed = 65;
     }
 }

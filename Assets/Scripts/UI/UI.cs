@@ -31,23 +31,23 @@ public class UI : MonoBehaviour
     void Update()
     {
         ui.thisDistation.text = Mathf.Round(Mathf.Abs(tubeController.positionTubeZ)).ToString();
+        ui.maxDistationInGame.text = PlayerPrefs.GetFloat($"distation").ToString();
         ui.thisColMutagen.text = player.colMutagen.ToString();
 
 
-        
-       /* if (player.timer)
-        {
-            timerImage.SetActive(true);
-            animator.SetBool("timer", true);
-        }
-        else { timerImage.SetActive(false); animator.SetBool("timer", false); }*/
+        /* if (player.timer)
+         {
+             timerImage.SetActive(true);
+             animator.SetBool("timer", true);
+         }
+         else { timerImage.SetActive(false); animator.SetBool("timer", false); }*/
 
-       /* if (player.blastScreen)
-        { animator.SetTrigger("blast"); player.blastScreen = false; }*/
-        
+        /* if (player.blastScreen)
+         { animator.SetTrigger("blast"); player.blastScreen = false; }*/
+
         /*if(player.isNoGravityBaff) NoGravityButton.SetActive(true);
         else NoGravityButton.SetActive(false);*/
-        
+
         /*if (player.doubleMutagen)
         {
             doubleMutagenImage.SetActive(true);
@@ -57,6 +57,10 @@ public class UI : MonoBehaviour
         {
             ui.timerBar.fillAmount = gameManager.time;
         }*/
+        if (timer)
+        {
+            ui.timerBar.fillAmount = gameManager.time;
+        }
     }
 
     public void BuffsUI(bool isTimer, bool timer, int buffNumer)
@@ -65,7 +69,7 @@ public class UI : MonoBehaviour
         if (isTimer)
         {
             ui.timerImage.SetActive(timer);
-            animator.SetBool("timer", timer);
+            //animator.SetBool("timer", timer);
         }
 
         switch (buffNumer)

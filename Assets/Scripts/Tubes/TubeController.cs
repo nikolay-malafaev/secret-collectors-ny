@@ -8,8 +8,8 @@ public class TubeController : MonoBehaviour
     [Range(0, 100)]
     public float[] oddsTubes;
     
-    public float addSpeed;
-    public float periodAddSpeed = 25;
+    public float numberAddSpeed;
+    public float periodAddSpeed = 10;
     public GameObject mutagens;
     [HideInInspector] public Player player;
     [HideInInspector] public bool isSpawnTunnels;
@@ -17,19 +17,23 @@ public class TubeController : MonoBehaviour
     [HideInInspector] public List<Tube> spawnTubes = new List<Tube>();
     [HideInInspector] public bool pausePosition;
     [HideInInspector] public float positionTubeZ;
-    [HideInInspector] public float numberAddSpeed;
+     
     
     [SerializeField] private Tube[] tubePrefabs;
     [SerializeField] private Tube startTube;
     [SerializeField] private GameObject mainTube;
+    [SerializeField] private GameManager gameManager;
     private bool doubleTubeSpawn;
     private float nextActionTimeAddSpeed;
+    private float addSpeed;
     
     void Start()
     {
         paulsController = GetComponentInChildren<PaulsController>();
         doubleTubeSpawn = false;
-        addSpeed = 0.1f;
+        addSpeed = 0.104f;
+        numberAddSpeed = 0.0005f;
+        nextActionTimeAddSpeed = 0;
         spawnTubes.Add(startTube);
         StartCoroutine(DoudleTubeSpawn());
         isSpawnTunnels = true;

@@ -15,7 +15,7 @@ public class BuffController : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(BuffsSpawn());
+        Spawn();
     }
 
     public void Spawn()
@@ -28,7 +28,7 @@ public class BuffController : MonoBehaviour
 
     IEnumerator BuffsSpawn()
     {
-        yield return new WaitForSeconds(13f);
+        yield return new WaitForSeconds(2f);
         Spawn();
     }
 
