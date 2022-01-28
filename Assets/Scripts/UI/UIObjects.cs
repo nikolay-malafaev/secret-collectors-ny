@@ -10,6 +10,7 @@ public class UIObjects : MonoBehaviour
     public Text colMutagen;
     public Text thisColMutagen;
     public Text maxDistation;
+    public Text maxDistationInGame;
     public Text thisDistation;
     
     [Header("UIObjects")]

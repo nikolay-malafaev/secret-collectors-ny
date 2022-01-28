@@ -42,6 +42,7 @@ public class Player : MonoBehaviour
     private bool m_IsSwiping = false;
     private Vector2 m_StartingTouch;
     private float lastMovidPlayerSpeed;
+    private float countCrash;
 
     void Start()
     {
@@ -127,6 +128,7 @@ public class Player : MonoBehaviour
             }
         }
 #endif
+        onGame = gameManager.game;
         m_TargetPosition = new Vector3(m_TargetPosition.x, positionY, m_TargetPosition.z);
         
        // if (burable || doubleMutagen || isNoGravityBaff)
@@ -146,14 +148,18 @@ public class Player : MonoBehaviour
             }
             else
             {
-                verticalTargetPosition.y = Mathf.Sin(ratio * 0.5f) * 0.4f; //* Mathf.PI
+                verticalTargetPosition.y = Mathf.Sin(ratio * 0.2f) * 0.6f; //* Mathf.PI
             }
         }
-        transform.position = Vector3.MoveTowards( transform.position, verticalTargetPosition, MovidPlayerSpeed * Time.deltaTime);
-        transform.rotation = Quaternion.RotateTowards( transform.rotation, vetricalQuaternion, 250 * Time.deltaTime);
+
+        if (onGame)
+        {
+            transform.position = Vector3.MoveTowards( transform.position, verticalTargetPosition, MovidPlayerSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards( transform.rotation, vetricalQuaternion, 250 * Time.deltaTime);
+        }
+       
         if (Math.Round(transform.position.y - 0.1f, 1) > positionY) m_IsFly = true;  //-0.7
         else m_IsFly = false;
-        onGame = gameManager.game;
     }
     
 
@@ -184,7 +190,6 @@ public class Player : MonoBehaviour
         { 
             float correctJumpLength = jumpLength * (1.0f + tubeController.numberAddSpeed);
            m_JumpStart = Mathf.Abs(tubeController.transform.position.z);
-           //m_JumpStart = (float)System.Math.Round(tubeController.mainTube.transform.position.z, 1);
            m_Jumping = true;
         }
     }
@@ -230,7 +235,8 @@ public class Player : MonoBehaviour
                 }
                 else if (gameManager.test)
                 {
-                    Debug.LogError("Game over!");
+                    countCrash++;
+                    Debug.LogError("Game over: " + countCrash);
                 }
                 
                 break;

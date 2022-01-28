@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,7 +10,7 @@ public class GameManager : MonoBehaviour
 {
     public bool test;
     [HideInInspector] public bool game;
-    [HideInInspector] public int[] globalTimeBuff;
+    [HideInInspector] public float[] globalTimeBuff;
     [HideInInspector] public float time;
     
     [SerializeField] private TubeController tubeController;
@@ -17,6 +18,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Player player;
     [SerializeField] private UI UI;
     private bool timer;
+    private int numberBuff;
     
     [SerializeField] private CameraController cameraController;
     //number:       0         1          2       3
@@ -24,11 +26,14 @@ public class GameManager : MonoBehaviour
     //timer:    true      true       false    true
 
     [HideInInspector] public bool[] buffs = new bool[4];
-    
+    private float nextAction;
+    private float period;
+
     void Start()
     {
+        period = 1f;
         buffs = new bool[4];
-        globalTimeBuff = new int[] {10, 10, 10, 10};
+        globalTimeBuff = new float[] {10f, 10f, 10f, 10f};
         tubeController.pausePosition = !test;
         game = test;
     }
@@ -37,19 +42,17 @@ public class GameManager : MonoBehaviour
     {
         if (player.healthPlayer == 0)
         {
+            game = false;
             tubeController.pausePosition = true;
             player.healthPlayer = -1;
             UI.GameOver();
         }
-        
         if (PlayerPrefs.GetFloat($"distation") < Mathf.Abs(tubeController.positionTubeZ))
         {
             PlayerPrefs.SetFloat($"distation", Mathf.Round(Mathf.Abs(tubeController.positionTubeZ)));
         }
     }
-    
 
-    
 
     public void TransitionGame()
     {
@@ -96,14 +99,17 @@ public class GameManager : MonoBehaviour
                 numberBuff = 3;
                 break;
         }
+
         
         buffs[numberBuff] = true;
         if (isTimer & numberBuff > -1)
         {
+            this.numberBuff = numberBuff;
             timer = true;
+            nextAction = 0;
             time = 1;
             StartCoroutine(TimeBuff(isTimer, numberBuff));
-            //StartCoroutine(Timer(numberBuff));
+            StartCoroutine(GlobalTimeBuff());
         }
         UI.BuffsUI(isTimer, timer, numberBuff);
     }
@@ -115,14 +121,13 @@ public class GameManager : MonoBehaviour
         buffs[number] = false;
         UI.BuffsUI(isTimer, timer, number);
     }
-    
-    /*IEnumerator Timer(int number)
+
+    IEnumerator GlobalTimeBuff()
     {
-        yield return new WaitForSeconds(globalTimeBuff[number] / 100);
-        time -= globalTimeBuff[number] / 100;
-        Debug.Log(time);
+        yield return new WaitForSeconds(1f / globalTimeBuff[numberBuff]);
+        time -= (1f / (globalTimeBuff[numberBuff] * 10));
         if(!timer) yield break;
-        StartCoroutine(Timer(number));
-    }*/
+        StartCoroutine(GlobalTimeBuff());
+    }
 }
 
