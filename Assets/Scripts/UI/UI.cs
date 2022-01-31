@@ -69,7 +69,7 @@ public class UI : MonoBehaviour
         if (isTimer)
         {
             ui.timerImage.SetActive(timer);
-            //animator.SetBool("timer", timer);
+            animator.SetBool("timer", timer);
         }
 
         switch (buffNumer)

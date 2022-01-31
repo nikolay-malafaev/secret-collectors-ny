@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class Player : MonoBehaviour
 {
@@ -20,17 +21,17 @@ public class Player : MonoBehaviour
     private bool timer;
     [HideInInspector] public bool IsNoGravity;
 
-
-
+    
+    [SerializeField] private GameObject Lantern;
     public bool m_Jumping;
     public bool m_IsFly;
     public Vector3 m_TargetPosition;
     private Vector3 verticalTargetPosition;
     public GameManager gameManager;
     public TubeController tubeController;
-    public Animator animator;
     public CameraController camera;
     private Quaternion vetricalQuaternion;
+    [HideInInspector] public Animator animator;
     [HideInInspector] public int eulerCorner;
     [HideInInspector] public float yCorner;
     [HideInInspector] public bool isNoGravityBaff;
@@ -43,16 +44,41 @@ public class Player : MonoBehaviour
     private Vector2 m_StartingTouch;
     private float lastMovidPlayerSpeed;
     private float countCrash;
+    private int chooseAnimation;
+    private Quaternion startRotation = Quaternion.Euler(0, 130, 0);
 
     void Start()
     {
+        animator = GetComponentInChildren<Animator>();
         lastMovidPlayerSpeed = MovidPlayerSpeed;
         IsNoGravity = false;
-        positionY = -0.708f;
+        positionY = -1;
         m_TargetPosition = new Vector3(0, positionY, 4.31f);
         healthPlayer = 1;
         m_IsFly = false;
+
+        if (gameManager.test)
+        {
+            animator.SetTrigger("run");
+        }
+        else
+        {
+            Lantern.SetActive(false);
+            vetricalQuaternion = startRotation;
+            transform.rotation = startRotation;
+            StartCoroutine(AnimationFun());
+        }
     }
+    
+    IEnumerator AnimationFun()
+    {
+        yield return new WaitForSeconds(5);
+        chooseAnimation = Random.Range(0, 3);
+        animator.SetInteger("choose", chooseAnimation);
+        if(!gameManager.game) StartCoroutine(AnimationFun());
+    }
+    
+    
 
     void Update()
     {
@@ -185,17 +211,19 @@ public class Player : MonoBehaviour
     public void Jump()
     {
         if(m_IsFly || tabooOnMove || !onGame) return;
-        
+
         if (!m_Jumping)
-        { 
+        {
             float correctJumpLength = jumpLength * (1.0f + tubeController.numberAddSpeed);
            m_JumpStart = Mathf.Abs(tubeController.transform.position.z);
            m_Jumping = true;
+           animator.SetTrigger("jump");
         }
     }
     public void ChangeLane(int direction)
     {
         if(IsNoGravity || tabooOnMove || !onGame) return;
+        
         
         int targetLane = m_CurrentLane + direction;
         if (targetLane < 0 || targetLane > 2)
@@ -203,6 +231,8 @@ public class Player : MonoBehaviour
             return;
         m_CurrentLane = targetLane;
         m_TargetPosition = new Vector3((m_CurrentLane - 1), positionY, 4.31f); //*trackManager.laneOffset
+        if(direction > 0) animator.SetTrigger("right");
+        if(direction < 0) animator.SetTrigger("left");
     }
 
     
@@ -285,6 +315,13 @@ public class Player : MonoBehaviour
         {
             tabooOnMove = false;
         }
+    }
+
+    public void ToGame()
+    {
+        Lantern.SetActive(true);
+        animator.SetTrigger("run");
+        vetricalQuaternion = Quaternion.Euler(0, 0, 0);
     }
 
     
