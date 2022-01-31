@@ -46,6 +46,7 @@ public class GameManager : MonoBehaviour
             tubeController.pausePosition = true;
             player.healthPlayer = -1;
             UI.GameOver();
+            player.animator.SetTrigger("fall");
         }
         if (PlayerPrefs.GetFloat($"distation") < Mathf.Abs(tubeController.positionTubeZ))
         {
@@ -57,6 +58,7 @@ public class GameManager : MonoBehaviour
     public void TransitionGame()
     {
         cameraController.ToGame();
+        player.ToGame();
         game = !game;
         tubeController.pausePosition = !game;
     }
@@ -109,25 +111,16 @@ public class GameManager : MonoBehaviour
             nextAction = 0;
             time = 1;
             StartCoroutine(TimeBuff(isTimer, numberBuff));
-            StartCoroutine(GlobalTimeBuff());
         }
         UI.BuffsUI(isTimer, timer, numberBuff);
     }
-    
+
     IEnumerator TimeBuff(bool isTimer, int number)
     {
         yield return new WaitForSeconds(globalTimeBuff[number]);
         timer = false;
         buffs[number] = false;
         UI.BuffsUI(isTimer, timer, number);
-    }
-
-    IEnumerator GlobalTimeBuff()
-    {
-        yield return new WaitForSeconds(1f / globalTimeBuff[numberBuff]);
-        time -= (1f / (globalTimeBuff[numberBuff] * 10));
-        if(!timer) yield break;
-        StartCoroutine(GlobalTimeBuff());
     }
 }
 

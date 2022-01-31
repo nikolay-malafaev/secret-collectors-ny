@@ -9,6 +9,7 @@ public class BuffController : MonoBehaviour
     [SerializeField] private GameObject mainSpawn;
     public GameObject destroyerBuffs;
     public Buff[] baffs;
+    private Buff buffInScene;
     
     [Range(0, 100)]
     public float[] oddsBaffs;
@@ -18,18 +19,24 @@ public class BuffController : MonoBehaviour
         Spawn();
     }
 
+    private void Update()
+    {
+        if (buffInScene != null)
+        {
+            if (buffInScene.transform.position.z < -1)
+            { 
+                Destroy(buffInScene.gameObject);
+                Spawn();
+            }
+        } else Spawn();
+    }
+
     public void Spawn()
     { 
         int randomPointBuff = Random.Range(0, 5);
         Buff buff = Instantiate(baffs[Mathf.RoundToInt(Choose(oddsBaffs))], transform, true);
         buff.transform.position = mainSpawn.transform.GetChild(randomPointBuff).position;
-        StartCoroutine(BuffsSpawn());
-    }
-
-    IEnumerator BuffsSpawn()
-    {
-        yield return new WaitForSeconds(2f);
-        Spawn();
+        buffInScene = buff;
     }
 
     public void Blast()
