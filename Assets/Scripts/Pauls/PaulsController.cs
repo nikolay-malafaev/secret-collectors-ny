@@ -16,6 +16,7 @@ public class PaulsController : MonoBehaviour
     private int[] countPaulsBetween;
 
     [Range(0, 100)] public float[] oddsBarriers;
+    [Range(0, 100)] public float[] oddsPaul;
     private int countPauls;
     private int[] positionRoad = new []{0, 0, 0};
     private bool roadCreativ;
@@ -23,6 +24,7 @@ public class PaulsController : MonoBehaviour
     private bool newRoad;
     private int lengthRoad;
     private int currentLegthRoad;
+    private int numberPaul = 1;
 
     private void Start()
     {
@@ -40,6 +42,10 @@ public class PaulsController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             RoadGenerator();
+        }
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            //numberPaul = 2;
         }
     }
 
@@ -61,11 +67,20 @@ public class PaulsController : MonoBehaviour
     private void SpawnPauls()
     {
         int countBarriers;
-        int paulNumber;
+        int numberBarrier;
         int positionBarrier = 0;
         int busyPosition = 0;
         Vector3 offset;
-        Paul newPaul = Instantiate(Pauls[1], transform, true);
+
+        numberPaul = Mathf.RoundToInt(ChoosePauls(oddsPaul));
+        Paul newPaul = Instantiate(Pauls[numberPaul], transform, true);
+        
+        if (numberPaul == 2)
+        {
+            PaulPit paulPit = newPaul.GetComponent<PaulPit>();
+            paulPit.ActiveBag(Random.Range(0, 3));
+            numberPaul = 1;
+        }
         newPaul.transform.position = spawnPauls[spawnPauls.Count - 1].Begin.position - newPaul.End.localPosition;
         spawnPauls.Add(newPaul);
         //newPaul.transform.rotation = transform.rotation;
@@ -76,15 +91,15 @@ public class PaulsController : MonoBehaviour
             countBarriers = Random.Range(1, 3);
             for (int i = 0; i < countBarriers; i++)
             {
-                paulNumber = PaulGenerator();
-                if (countPaulsBetween[paulNumber] != 0 & BarriersPrefabs[paulNumber].sameTypeDistation != 0)
+                numberBarrier = PaulGenerator();
+                if (countPaulsBetween[numberBarrier] != 0 & BarriersPrefabs[numberBarrier].sameTypeDistation != 0)
                 {
-                    countPaulsBetween[paulNumber]--;
-                    paulNumber = PaulGenerator(paulNumber);
+                    countPaulsBetween[numberBarrier]--;
+                    numberBarrier = PaulGenerator(numberBarrier);
                 }
 
-                Barrier barrier = Instantiate(BarriersPrefabs[paulNumber], newPaul.transform, true);
-                if (barrier.sameTypeDistation != 0) countPaulsBetween[paulNumber] = barrier.sameTypeDistation;
+                Barrier barrier = Instantiate(BarriersPrefabs[numberBarrier], newPaul.transform, true);
+                if (barrier.sameTypeDistation != 0) countPaulsBetween[numberBarrier] = barrier.sameTypeDistation;
                 if ((barrier.oneCountBarriers & i > 0) || (barrier.oneCountBarriers & roadCreativ))
                 {
                     Destroy(barrier.gameObject);
@@ -171,19 +186,19 @@ public class PaulsController : MonoBehaviour
 
     public int PaulGenerator()
     {
-        int paulNumber;
-        paulNumber = Mathf.RoundToInt(Choose(oddsBarriers));
-        return paulNumber;
+        int number;
+        number = Mathf.RoundToInt(ChooseBarriers(oddsBarriers));
+        return number;
     }
 
     public int PaulGenerator(int unwanted)
     {
-        int paulNumber;
+        int number;
         int counter = 0;
         while (true)
         {
-            paulNumber = Mathf.RoundToInt(Choose(oddsBarriers));
-            if (paulNumber != unwanted) break;
+            number = Mathf.RoundToInt(ChooseBarriers(oddsBarriers));
+            if (number != unwanted) break;
             counter++;
             if (counter > 500)
             {
@@ -192,7 +207,7 @@ public class PaulsController : MonoBehaviour
             }
         }
 
-        return paulNumber;
+        return number;
     }
 
     public int PositionGenerator(int unwanted)
@@ -228,7 +243,32 @@ public class PaulsController : MonoBehaviour
     
 
 
-    float Choose(float[] probs)
+    float ChooseBarriers(float[] probs)
+    {
+
+        float total = 0;
+        foreach (float elem in probs)
+        {
+            total += elem;
+        }
+
+        float randomPoint = Random.value * total;
+
+        for (int i = 0; i < probs.Length; i++)
+        {
+            if (randomPoint < probs[i])
+            {
+                return i;
+            }
+            else
+            {
+                randomPoint -= probs[i];
+            }
+        }
+        return probs.Length - 1;
+    }
+    
+    float ChoosePauls(float[] probs)
     {
 
         float total = 0;
