@@ -94,7 +94,7 @@ public class TubeController : MonoBehaviour
 
     IEnumerator DoudleTubeSpawn()
     {
-        yield return new WaitForSeconds(13f);
+        yield return new WaitForSeconds(3f);
         doubleTubeSpawn = true;
     }
     

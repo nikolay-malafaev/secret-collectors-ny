@@ -23,6 +23,7 @@ Material:
   m_Name: Yellow Diffuse
   m_Shader: {fileID: -6465566751694194690, guid: 8f19bacb77895e54b8ab0b090b6ac6ef, type: 3}
   m_ShaderKeywords: ENUM_B71F3289574740C680AC4DA1DF4C98B4_B ENUM_C12134A557774B809242D02DBA35F846_B
+    ENUM_FE5EEC0649A5403D8C61FC38E087AC7E_B
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -100,6 +101,7 @@ Material:
     - Boolean_ca6781fcf7f94ca6b625f3ca37dce5d3: 0
     - ENUM_B71F3289574740C680AC4DA1DF4C98B4: 1
     - ENUM_C12134A557774B809242D02DBA35F846: 1
+    - ENUM_FE5EEC0649A5403D8C61FC38E087AC7E: 1
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
