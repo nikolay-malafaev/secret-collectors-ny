@@ -216,7 +216,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2020853385971974533}
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 2.045, y: -1.1, z: 0.42}
+  m_LocalPosition: {x: 2.191, y: -1.1, z: 0.42}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 5137333697550871790}
@@ -1037,7 +1037,6 @@ MonoBehaviour:
   TubeNumberTwo: {fileID: 3549453198637700560}
   Pauls: {fileID: 6152317006885033817}
   NewTube: {fileID: 2601569156011694417}
-  NewPaul: {fileID: 5425543588577098873}
   attachingPaul: {fileID: 6449093492201138079}
   globalController: {fileID: 0}
 --- !u!1 &7772433797105123874
@@ -1747,11 +1746,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bf09aef47a596b0409b98fdd727a7540, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071067
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bf09aef47a596b0409b98fdd727a7540, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.7071068
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bf09aef47a596b0409b98fdd727a7540, type: 3}
       propertyPath: m_LocalRotation.y
@@ -1759,7 +1758,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bf09aef47a596b0409b98fdd727a7540, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bf09aef47a596b0409b98fdd727a7540, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

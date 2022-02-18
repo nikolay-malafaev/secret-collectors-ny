@@ -35,6 +35,7 @@ public class DoubleTunnels : MonoBehaviour
     public void TurnTunnels() 
     {
         tubeController.isSpawnTunnels = false;
+        tubeController.player.camera.MoveHole();
         
         for (int i = 0; i < tubeController.spawnTubes.Count; i++)
         {
@@ -42,7 +43,7 @@ public class DoubleTunnels : MonoBehaviour
         }
         tubeController.mutagens.transform.SetParent(transform);
         paulsController.transform.SetParent(transform);
-        TubeNumberTwo.SetActive(false);
+        //TubeNumberTwo.SetActive(false);
         verticalTargetRotation = new Vector3(-0.5f, 0, 0);
         verticalTargetPosition = new Vector3(0.375f, 0, 0);
         StartCoroutine(FreeSpawnTube());
