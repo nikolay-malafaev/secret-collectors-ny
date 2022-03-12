@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class UI : MonoBehaviour
 {
     [SerializeField] private Player player;
-    [SerializeField] private TubeController tubeController;
+    [SerializeField] private ChunkController chunkController;
     [SerializeField] private GameManager gameManager; 
     private UIObjects ui;
     private Animator animator;
@@ -30,9 +30,9 @@ public class UI : MonoBehaviour
 
     void Update()
     {
-        ui.thisDistation.text = Mathf.Round(Mathf.Abs(tubeController.positionTubeZ)).ToString();
-        ui.maxDistationInGame.text = PlayerPrefs.GetFloat($"distation").ToString();
-        ui.thisColMutagen.text = player.colMutagen.ToString();
+        //ui.thisDistation.text = Mathf.Round(Mathf.Abs(tubeController.positionTubeZ)).ToString();
+        //ui.maxDistationInGame.text = PlayerPrefs.GetFloat($"distation").ToString();
+        //ui.thisColMutagen.text = player.colMutagen.ToString();
 
 
         /* if (player.timer)

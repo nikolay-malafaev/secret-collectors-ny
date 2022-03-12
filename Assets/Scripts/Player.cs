@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -28,9 +29,9 @@ public class Player : MonoBehaviour
     public Vector3 m_TargetPosition;
     private Vector3 verticalTargetPosition;
     public GameManager gameManager;
-    public TubeController tubeController;
+    public ChunkController chunkController;
     public CameraController camera;
-    private Quaternion vetricalQuaternion;
+    [HideInInspector] public Quaternion vetricalQuaternion;
     [HideInInspector] public Animator animator;
     [HideInInspector] public int eulerCorner;
     [HideInInspector] public float yCorner;
@@ -53,7 +54,7 @@ public class Player : MonoBehaviour
         lastMovidPlayerSpeed = MovidPlayerSpeed;
         IsNoGravity = false;
         positionY = -1;
-        m_TargetPosition = new Vector3(0, positionY, 4.31f);
+        m_TargetPosition = new Vector3(0, positionY, 0);
         healthPlayer = 1;
         m_IsFly = false;
 
@@ -166,15 +167,17 @@ public class Player : MonoBehaviour
 
         if (m_Jumping)
         {
-            float correctJumpLength = jumpLength * (1.0f + tubeController.numberAddSpeed);
-            float ratio = (Mathf.Abs(tubeController.transform.position.z) - m_JumpStart) / correctJumpLength;
-            if (ratio >= 1.5f)   // System.Math.Round(transform.position.y, 1)  > 0.23f
+            float correctJumpLength = jumpLength * (1.0f + chunkController.numberAddSpeed);
+            float ratio = 0;
+            if(gameManager.direction == 0 || gameManager.direction == 2) ratio = (Mathf.Abs(chunkController.transform.position.z) - m_JumpStart) / correctJumpLength;
+            if(gameManager.direction == 1 || gameManager.direction == 3) ratio = (Mathf.Abs(chunkController.transform.position.x) - m_JumpStart) / correctJumpLength;
+            if (Mathf.Abs(ratio) >= 1.5f)   // System.Math.Round(transform.position.y, 1)  > 0.23f
             {
                 m_Jumping = false;
             }
             else
             {
-                verticalTargetPosition.y = Mathf.Sin(ratio * 0.2f) * 0.6f; //* Mathf.PI
+                verticalTargetPosition.y = Mathf.Sin(ratio * 0.2f) * 0.6f;
             }
         }
 
@@ -189,48 +192,46 @@ public class Player : MonoBehaviour
     }
     
 
-    public void NoGravity()
-    {
-        if(!isNoGravityBaff || tabooOnMove || !onGame) return;
-        
-        IsNoGravity = !IsNoGravity;
-        if (IsNoGravity)
-        {
-            eulerCorner = 180;
-            positionY = 1.249f;
-        }
-        else
-        {
-            eulerCorner = 0;
-            positionY = -0.708f;
-            m_CurrentLane = 1;
-        }
-        vetricalQuaternion = Quaternion.Euler(0, 0,eulerCorner);
-        m_TargetPosition = new Vector3(0, positionY, 4.31f);
-    }
+   
     public void Jump()
     {
         if(m_IsFly || tabooOnMove || !onGame) return;
 
         if (!m_Jumping)
         {
-            float correctJumpLength = jumpLength * (1.0f + tubeController.numberAddSpeed);
-           m_JumpStart = Mathf.Abs(tubeController.transform.position.z);
+           //float correctJumpLength = jumpLength * (1.0f + chunkController.numberAddSpeed);
+           if(gameManager.direction == 0 || gameManager.direction == 2) m_JumpStart = Mathf.Abs(chunkController.transform.position.z);
+           if(gameManager.direction == 1 || gameManager.direction == 3) m_JumpStart = Mathf.Abs(chunkController.transform.position.x);
            m_Jumping = true;
            animator.SetTrigger("jump");
         }
     }
+    
     public void ChangeLane(int direction)
     {
         if(IsNoGravity || tabooOnMove || !onGame) return;
-        
-        
+
         int targetLane = m_CurrentLane + direction;
         if (targetLane < 0 || targetLane > 2)
-            // Ignore, we are on the borders.
             return;
         m_CurrentLane = targetLane;
-        m_TargetPosition = new Vector3((m_CurrentLane - 1), positionY, 4.31f); //*trackManager.laneOffset
+        
+        switch (gameManager.direction)
+        {
+            case 0:
+                m_TargetPosition = new Vector3((m_CurrentLane - 1), positionY, 0);
+                break;
+            case 1:
+                m_TargetPosition = new Vector3(0, positionY, -(m_CurrentLane - 1));
+                break;
+            case 2:
+                m_TargetPosition = new Vector3(-(m_CurrentLane - 1), positionY, 0);
+                break;
+            case 3:
+                m_TargetPosition = new Vector3(0, positionY, (m_CurrentLane - 1));
+                break;
+        }
+        
         if(direction > 0) animator.SetTrigger("right");
         if(direction < 0) animator.SetTrigger("left");
     }
@@ -284,8 +285,8 @@ public class Player : MonoBehaviour
                 Destroy(col.gameObject);
                 break;
             case "Target":
-                DoubleTunnels doubleTunnels = col.gameObject.GetComponentInParent<DoubleTunnels>();
-                doubleTunnels.TurnTunnels();
+                //Target target = col.gameObject.GetComponent<Target>();
+                
                 break;
             case "PaulHole":
                 tabooOnMove = true;
@@ -315,6 +316,26 @@ public class Player : MonoBehaviour
         {
             tabooOnMove = false;
         }
+    }
+    
+    public void NoGravity()
+    {
+        if(!isNoGravityBaff || tabooOnMove || !onGame) return;
+        
+        IsNoGravity = !IsNoGravity;
+        if (IsNoGravity)
+        {
+            eulerCorner = 180;
+            positionY = 1.249f;
+        }
+        else
+        {
+            eulerCorner = 0;
+            positionY = -0.708f;
+            m_CurrentLane = 1;
+        }
+        vetricalQuaternion = Quaternion.Euler(0, 0,eulerCorner);
+        m_TargetPosition = new Vector3(0, positionY, 0);
     }
 
     public void ToGame()

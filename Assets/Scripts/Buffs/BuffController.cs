@@ -10,12 +10,15 @@ public class BuffController : MonoBehaviour
     public GameObject destroyerBuffs;
     public Buff[] baffs;
     private Buff buffInScene;
+    private GameManager gameManager;
+    private int distationDestroyBaff = 3;
     
     [Range(0, 100)]
     public float[] oddsBaffs;
 
     private void Start()
     {
+        gameManager = FindObjectOfType<GameManager>();
         Spawn();
     }
 
@@ -23,19 +26,43 @@ public class BuffController : MonoBehaviour
     {
         if (buffInScene != null)
         {
-            if (buffInScene.transform.position.z < -1)
-            { 
-                Destroy(buffInScene.gameObject);
-                Spawn();
+            switch (gameManager.direction)
+            {
+                case 0:
+                    if (buffInScene.transform.position.z < -distationDestroyBaff)
+                    {
+                        Spawn();
+                    }
+                    break;
+                case 1:
+                    if (buffInScene.transform.position.x < -distationDestroyBaff)
+                    {
+                        Spawn();
+                    }
+                    break;
+                case 2:
+                    if (buffInScene.transform.position.z > distationDestroyBaff)
+                    {
+                        Spawn();
+                    }
+                    break;
+                case 3:
+                    if (buffInScene.transform.position.x > distationDestroyBaff)
+                    {
+                        Spawn();
+                    }
+                    break;
             }
-        } else Spawn();
+        }
     }
 
     public void Spawn()
     { 
+        if (buffInScene != null) Destroy(buffInScene.gameObject);
         int randomPointBuff = Random.Range(0, 5);
         Buff buff = Instantiate(baffs[Mathf.RoundToInt(Choose(oddsBaffs))], transform, true);
         buff.transform.position = mainSpawn.transform.GetChild(randomPointBuff).position;
+        buff.transform.rotation = mainSpawn.transform.rotation;
         buffInScene = buff;
     }
 
