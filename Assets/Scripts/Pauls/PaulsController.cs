@@ -8,23 +8,16 @@ using Random = UnityEngine.Random;
 public class PaulsController : MonoBehaviour
 {
     public Barrier[] BarriersPrefabs;
-    public Road[] RoadPrefabs;
     public Paul[] Pauls;
-    public TubeController tubeController;
-    [HideInInspector] public List<Paul> spawnPauls = new List<Paul>();
-
+    
+    private ChunkController chunkController;
+    private GameManager gameManager;
+    private Player player;
     private int[] countPaulsBetween;
 
     [Range(0, 100)] public float[] oddsBarriers;
-    [Range(0, 100)] public float[] oddsPaul;
     private int countPauls;
-    private int[] positionRoad = new []{0, 0, 0};
-    private bool roadCreativ;
-    private int numberPositionInRoad;
-    private bool newRoad;
-    private int lengthRoad;
-    private int currentLegthRoad;
-    private int numberPaul = 1;
+    [HideInInspector] public Paul lastPaul;
 
     private void Start()
     {
@@ -33,34 +26,62 @@ public class PaulsController : MonoBehaviour
         {
             countPaulsBetween[i] = 0;
         }
-
-        spawnPauls.Add(Pauls[0]);
+        
+        player = FindObjectOfType<Player>();
+        gameManager = FindObjectOfType<GameManager>();
+        chunkController = FindObjectOfType<ChunkController>();
+        lastPaul = Pauls[0];
     }
+    
+    
+    
 
-    private void Update()
+    void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            RoadGenerator();
-        }
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            //numberPaul = 2;
-        }
-    }
-
-    void FixedUpdate()
-    {
-        if (spawnPauls[spawnPauls.Count - 1].End.position.z < 55 & tubeController.isSpawnTunnels)
-        {
-            SpawnPauls();
-        }
-
-        if (spawnPauls.Count > 95)
+        if (transform.childCount > 95)
         {
             DestoryPauls();
         }
 
+        if (chunkController.isSpawnPermit)
+        {
+            switch (gameManager.direction)
+            {
+                case 0:
+                    if (lastPaul.End.position.z < 55)
+                    {
+                        SpawnPauls();
+                    }
+
+                    break;
+                case 1:
+                    if (lastPaul.End.position.x < 55)
+                    {
+                        SpawnPauls();
+                    }
+
+                    break;
+                case 2:
+                    if (lastPaul.End.position.z > -55)
+                    {
+                        SpawnPauls();
+                    }
+
+                    break;
+                case 3:
+                    if (lastPaul.End.position.x > -55)
+                    {
+                        SpawnPauls();
+                    }
+
+                    break;
+            }
+        }
+
+        if (Input.GetKey(KeyCode.P))
+        {
+            SpawnPauls();
+        }
         
     }
 
@@ -71,63 +92,78 @@ public class PaulsController : MonoBehaviour
         int positionBarrier = 0;
         int busyPosition = 0;
         Vector3 offset;
-
-        numberPaul = Mathf.RoundToInt(ChoosePauls(oddsPaul));
-        Paul newPaul = Instantiate(Pauls[numberPaul], transform, true);
         
-        if (numberPaul == 2)
+        Paul newPaul = Instantiate(Pauls[1], transform, true);
+        
+        switch (gameManager.direction)
         {
-            PaulPit paulPit = newPaul.GetComponent<PaulPit>();
-            paulPit.ActiveBag(Random.Range(0, 3));
-            numberPaul = 1;
+            case 0:
+                newPaul.transform.position = lastPaul.transform.position + new Vector3(0, 0, 0.989f);
+                break;
+            case 1:
+                newPaul.transform.position = lastPaul.transform.position + new Vector3(0.989f, 0, 0);
+                newPaul.transform.rotation = Quaternion.Euler(0, newPaul.transform.rotation.eulerAngles.y + 90, 0);
+                break;
+            case 2:
+                newPaul.transform.position = lastPaul.transform.position + new Vector3(0, 0, -0.989f);
+                newPaul.transform.rotation = Quaternion.Euler(0, newPaul.transform.rotation.eulerAngles.y + 180, 0);
+                break;
+            case 3:
+                newPaul.transform.position = lastPaul.transform.position + new Vector3(-0.989f, 0, 0);
+                newPaul.transform.rotation = Quaternion.Euler(0, newPaul.transform.rotation.eulerAngles.y - 90, 0);
+                break;
         }
-        newPaul.transform.position = spawnPauls[spawnPauls.Count - 1].Begin.position - newPaul.End.localPosition;
-        spawnPauls.Add(newPaul);
-        //newPaul.transform.rotation = transform.rotation;
+
+        lastPaul = newPaul;
+
+        
 
         if (countPauls == 0)
         {
             countPauls = Random.Range(3, 7);
             countBarriers = Random.Range(1, 3);
+            
+            
             for (int i = 0; i < countBarriers; i++)
             {
-                numberBarrier = PaulGenerator();
-                if (countPaulsBetween[numberBarrier] != 0 & BarriersPrefabs[numberBarrier].sameTypeDistation != 0)
+                numberBarrier = Mathf.RoundToInt(ChooseBarriers(oddsBarriers));
+                int sameType = BarriersPrefabs[numberBarrier].sameTypeDistation;
+                if (countPaulsBetween[numberBarrier] != 0 & sameType != 0)
                 {
                     countPaulsBetween[numberBarrier]--;
-                    numberBarrier = PaulGenerator(numberBarrier);
+                    numberBarrier = Generator(numberBarrier, "paul");
                 }
 
+
                 Barrier barrier = Instantiate(BarriersPrefabs[numberBarrier], newPaul.transform, true);
-                if (barrier.sameTypeDistation != 0) countPaulsBetween[numberBarrier] = barrier.sameTypeDistation;
-                if ((barrier.oneCountBarriers & i > 0) || (barrier.oneCountBarriers & roadCreativ))
+
+                if (sameType != 0)
+                {
+                    countPaulsBetween[numberBarrier] = sameType;
+                }
+
+                if ((barrier.oneCountBarriers & i > 0))
                 {
                     Destroy(barrier.gameObject);
                     break;
                 }
 
                 offset = barrier.offsetBarrier;
+                
                 switch (barrier.possible)
                 {
                     case Barrier.PossiblePosition.Neutral:
-                        if (!roadCreativ)
+                        positionBarrier = Random.Range(0, 3);
+                        if (i == 0) busyPosition = positionBarrier;
+                        else if (i == 1)
                         {
-                            positionBarrier = Random.Range(0, 3);
-                            if (i == 0) busyPosition = positionBarrier;
-                            else if (i == 1)
+                            if (busyPosition == positionBarrier)
                             {
-                                if (busyPosition == positionBarrier)
-                                {
-                                    positionBarrier = PositionGenerator(busyPosition);
-                                }
+                                positionBarrier = Generator(busyPosition, "position");
                             }
                         }
-                        else
-                        {
-                            positionBarrier = PositionGenerator(numberPositionInRoad);
-                        }
-
                         break;
+                    
                     case Barrier.PossiblePosition.Center:
                         positionBarrier = 0;
                         break;
@@ -139,65 +175,44 @@ public class PaulsController : MonoBehaviour
                         break;
                 }
 
-                barrier.transform.position = newPaul.NumberBarriers[positionBarrier].transform.position + offset;
-                if (barrier.anyTypeDustation != 0) countPauls = barrier.anyTypeDustation;
-                if (barrier.oneCountBarriers) break;
+                if(newPaul.NumberBarriers.Length > 0) barrier.transform.position = newPaul.NumberBarriers[positionBarrier].transform.position + offset;
+                
+                var rotationBarrier = barrier.transform.rotation.eulerAngles;
+                barrier.transform.rotation = Quaternion.Euler(rotationBarrier.x, rotationBarrier.y + newPaul.transform.rotation.eulerAngles.y,rotationBarrier.z);
+                if (barrier.anyTypeDistation != 0) countPauls = barrier.anyTypeDistation;
+                if(barrier.oneCountBarriers) break;
             }
         }
         else
         {
             countPauls--;
         }
-
-        
-        
-        /*if (roadCreativ)
-        {
-            Road road;
-            if (lengthRoad == currentLegthRoad)
-            {
-                road = Instantiate(RoadPrefabs[0], newPaul.transform, true);
-                newRoad = false;
-            }
-            else if(lengthRoad == 1)
-            {
-                road = Instantiate(RoadPrefabs[0], newPaul.transform, true);
-                road.transform.Rotate(0, 0, 180);
-                road.transform.GetChild(0).tag = "UndRise";
-            }
-            else
-            {
-                road = Instantiate(RoadPrefabs[1], newPaul.transform, true);
-            }
-            
-
-            road.transform.position = newPaul.NumberBarriers[numberPositionInRoad].transform.position +
-                                      new Vector3(0f, 0.3f, 0);
-            lengthRoad--;
-            if (lengthRoad == 0) roadCreativ = false;
-        }*/
     }
 
     private void DestoryPauls()
     {
-        Destroy(spawnPauls[0].gameObject);
-        spawnPauls.RemoveAt(0);
+       Destroy(transform.GetChild(0).gameObject); 
     }
 
-    public int PaulGenerator()
+    public int Generator(int unwanted, string name)
     {
-        int number;
-        number = Mathf.RoundToInt(ChooseBarriers(oddsBarriers));
-        return number;
-    }
-
-    public int PaulGenerator(int unwanted)
-    {
-        int number;
+        int number = 0;
         int counter = 0;
         while (true)
         {
-            number = Mathf.RoundToInt(ChooseBarriers(oddsBarriers));
+            if (name == "paul")
+            {
+                number = Mathf.RoundToInt(ChooseBarriers(oddsBarriers));
+            }
+            else if( name == "position")
+            {
+                number = Random.Range(0, 3);
+            }
+            else
+            {
+                Debug.Log("Error name!");
+                break;
+            }
             if (number != unwanted) break;
             counter++;
             if (counter > 500)
@@ -206,69 +221,11 @@ public class PaulsController : MonoBehaviour
                 break;
             }
         }
-
         return number;
     }
-
-    public int PositionGenerator(int unwanted)
-    {
-        
-        int numberPosition;
-        int couner = 0;
-        while (true)
-        {
-            numberPosition = Random.Range(0, 3);
-            if (numberPosition != unwanted) break;
-            couner++;
-            if (couner > 500)
-            {
-                Debug.LogError("Position (WHILE!)");
-                break;
-            }
-        }
-
-        return numberPosition;
-    }
-
-    private void RoadGenerator()
-    {
-        lengthRoad = Random.Range(10, 25);
-        
-        currentLegthRoad = lengthRoad;
-        int[] position = new []{1, 2};
-        numberPositionInRoad = position[Random.Range(0, 2)];
-        newRoad = true;
-        roadCreativ = true;
-    }
     
-
-
-    float ChooseBarriers(float[] probs)
-    {
-
-        float total = 0;
-        foreach (float elem in probs)
-        {
-            total += elem;
-        }
-
-        float randomPoint = Random.value * total;
-
-        for (int i = 0; i < probs.Length; i++)
-        {
-            if (randomPoint < probs[i])
-            {
-                return i;
-            }
-            else
-            {
-                randomPoint -= probs[i];
-            }
-        }
-        return probs.Length - 1;
-    }
     
-    float ChoosePauls(float[] probs)
+    public float ChooseBarriers(float[] probs)
     {
 
         float total = 0;

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Crocodile : MonoBehaviour
 {
-    public TubeController tubeController;
+    public ChunkController chunkController;
     public Player player;
     public Animator animator;
 

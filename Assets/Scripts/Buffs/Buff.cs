@@ -39,7 +39,7 @@ public class Buff : MonoBehaviour
             Destroy(gameObject);
         }
 
-        if (col.gameObject.CompareTag("Barrier") || col.gameObject.CompareTag("Mutagen"))
+        if (col.gameObject.CompareTag("Mutagen"))
         {
             Destroy(gameObject);
         }

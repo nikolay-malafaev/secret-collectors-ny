@@ -5,8 +5,9 @@ using UnityEngine.Assertions.Must;
 
 public class Barrier : MonoBehaviour
 {
-    public int sameTypeDistation;
-    public int anyTypeDustation;
+    public int sameTypeDistation; // минимальное расстояние до barrer того же типа
+    public int anyTypeDistation; // минимальное расстояние до barrer любого типа
+    // typeBarriers
     public Vector3 offsetBarrier;
     public bool oneCountBarriers = false;
     public PossiblePosition possible;
