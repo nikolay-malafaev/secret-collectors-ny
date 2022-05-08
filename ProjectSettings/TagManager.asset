@@ -14,11 +14,11 @@ TagManager:
   - Tube
   - Camera
   - PaulHole
-  - Rise
-  - UndRise
-  - Track
-  - UpTrack
   - Paul
+  - Road
+  - BeginRoad
+  - EndRoad
+  - Change
   layers:
   - Default
   - TransparentFX

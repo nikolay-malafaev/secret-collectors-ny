@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class DoubleChunks : MonoBehaviour
 {
@@ -12,18 +14,21 @@ public class DoubleChunks : MonoBehaviour
     public Paul attachingPaul; //
     private int[] countPaulsBetween;
     [HideInInspector] public Animator animator;
-    private Target target;
+    [HideInInspector] public Target target;
     private Paul lastPaul;
 
-
+    private void Awake()
+    {
+        target = GetComponentInChildren<Target>();
+    }
 
     void Start()
     {
+        target = GetComponentInChildren<Target>();
         chunkController = GetComponentInParent<ChunkController>();
         animator = GetComponent<Animator>();
         paulsController = chunkController.GetComponentInChildren<PaulsController>();
         countPaulsBetween = new int[paulsController.BarriersPrefabs.Length];
-        target = GetComponentInChildren<Target>();
         StartCoroutine(SpawnPaulsTime());
         lastPaul = attachingPaul;
     }
@@ -37,8 +42,8 @@ public class DoubleChunks : MonoBehaviour
         chunkController.spawnChunks.Add(newChunk);
         chunkController.isSpawnPermit = true;
         paulsController.lastPaul = lastPaul;
-        
-        
+
+        int lastDirection = chunkController.gameManager.direction;
         switch (direction)
         {
             case Target.Direction.Right:
@@ -47,15 +52,17 @@ public class DoubleChunks : MonoBehaviour
                 chunkController.player.vetricalQuaternion = Quaternion.Euler(0, chunkController.player.vetricalQuaternion.eulerAngles.y + 90, 0);
                 chunkController.player.animator.SetTrigger("run");
                 chunkController.player.ChangeLane(-1);
+                chunkController.player.camera.Turn(1, lastDirection);
                 break;
             case Target.Direction.Left:
                 chunkController.gameManager.direction -= 1;
                 if (chunkController.gameManager.direction == -1) chunkController.gameManager.direction = 3;
                 chunkController.player.vetricalQuaternion = Quaternion.Euler(0, chunkController.player.vetricalQuaternion.eulerAngles.y - 90, 0);
                 chunkController.player.ChangeLane(1);
+                chunkController.player.camera.Turn(-1, lastDirection);
                 break;
         }
-        chunkController.gameManager.Turn();
+        chunkController.gameManager.Turn(direction);
     }
     
     

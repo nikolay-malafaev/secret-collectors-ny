@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Player player;
     [SerializeField] private UI UI;
     [SerializeField] private GameObject MainSpawn;
-    [SerializeField] private GameObject Light;
+    [SerializeField] private GameObject light;
     private bool timer;
     private int numberBuff;
     private GameObject ntv;
@@ -174,41 +174,41 @@ public class GameManager : MonoBehaviour
             
         }
      */
-    public void Turn()
-    { 
-        cameraController.transform.SetParent(player.transform);
+    public void Turn(Target.Direction directionTurn)
+    {
         Transform mainSpawn = MainSpawn.transform;
-       Transform Light = this.Light.transform;
-       
-      if (direction == -1) direction = 3;
-      if (direction == 4) direction = 0;
-
-
+        
+        if (direction == -1) direction = 3;
+        if (direction == 4) direction = 0;
+      
+        light.transform.SetParent(player.transform);
+        StartCoroutine(timeAften(0.37f));
         switch (direction)
         {
             case 0:
                 mainSpawn.position = new Vector3(0, 0.08f, 50);
                 mainSpawn.rotation = Quaternion.Euler(0, 0, 0);
-                Light.position = new Vector3(0, -0.1f, -3);
                 break;
             case 1:
                 mainSpawn.position = new Vector3(50, 0.08f, 0);
                 mainSpawn.rotation = Quaternion.Euler(0, 90, 0);
-                Light.position = new Vector3(-3, -0.1f, 0);
                 break;
             case 2:
                 mainSpawn.position = new Vector3(0, 0.08f, -50);
                 mainSpawn.rotation = Quaternion.Euler(0, 180, 0);
-                Light.position = new Vector3(0, -0.1f, 3);
                 break;
             case 3:
                 mainSpawn.position = new Vector3(-50, 0.08f, 0);
                 mainSpawn.rotation = Quaternion.Euler(0, -90, 0);
-                Light.position = new Vector3(3, -0.1f, 0);
                 break;
         }
         buffController.Spawn();
-        cameraController.Turn();
+    }
+
+    IEnumerator timeAften(float time)
+    {
+        yield return new WaitForSeconds(time);
+        light.transform.parent = null;
     }
 }
 

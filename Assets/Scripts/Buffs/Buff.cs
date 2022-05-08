@@ -43,5 +43,7 @@ public class Buff : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        
+        
     }
 }
