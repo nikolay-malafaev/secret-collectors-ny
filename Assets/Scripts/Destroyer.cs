@@ -6,7 +6,7 @@ public class Destroyer : MonoBehaviour
 {
     private void OnTriggerEnter(Collider col)
     {
-        if(col.gameObject.CompareTag("Barrier") || col.gameObject.CompareTag("Mutagen") || col.gameObject.CompareTag("Buff")) 
+        if(col.gameObject.CompareTag("Barrier") || col.gameObject.CompareTag("Mutagen")) 
           Destroy(col.gameObject);
     }
      

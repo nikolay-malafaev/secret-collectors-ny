@@ -30,6 +30,7 @@ GameObject:
   - component: {fileID: 5773827826230285928}
   - component: {fileID: 1493614647927331893}
   - component: {fileID: 1846999409}
+  - component: {fileID: 4916414381932233889}
   m_Layer: 0
   m_Name: Lantern
   m_TagString: Untagged
@@ -44,12 +45,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4323762281236657381}
-  m_LocalRotation: {x: -0.052335896, y: 0, z: 0, w: 0.9986295}
-  m_LocalPosition: {x: 0.197, y: 0.335, z: 0.005}
-  m_LocalScale: {x: 2.5, y: 1.6945188, z: 2.439845}
+  m_LocalRotation: {x: -0.052335918, y: -0.000000007450581, z: 0.000000012805685, w: 0.99862957}
+  m_LocalPosition: {x: 0.065585375, y: 0.3403042, z: 0.19528598}
+  m_LocalScale: {x: 2.5000002, y: 1.6945187, z: 2.4398446}
   m_Children: []
   m_Father: {fileID: 6385020703424385876}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: -6, y: 0, z: 0}
 --- !u!108 &1493614647927331893
 Light:
@@ -97,7 +98,7 @@ Light:
   m_Cookie: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
   m_DrawHalo: 1
   m_Flare: {fileID: 0}
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -114,6 +115,19 @@ Light:
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!114 &1846999409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4323762281236657381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UsePipelineSettings: 1
+--- !u!114 &4916414381932233889
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -156,8 +170,8 @@ Transform:
   m_LocalPosition: {x: 0, y: -0.71, z: -3.637}
   m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_Children:
-  - {fileID: 5773827826230285928}
   - {fileID: 1915122402628655194}
+  - {fileID: 5773827826230285928}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -195,7 +209,7 @@ MonoBehaviour:
   MovidPlayerSpeed: 4
   jumpLength: 1.5
   IsNoGravity: 0
-  Lantern: {fileID: 5214686040804486468}
+  Lantern: {fileID: 4323762281236657381}
   m_Jumping: 0
   m_IsFly: 0
   m_TargetPosition: {x: 0, y: 0, z: 0}
@@ -208,6 +222,7 @@ MonoBehaviour:
   yCorner: 0
   isNoGravityBaff: 0
   UI: {fileID: 0}
+  isChange: 0
 --- !u!65 &1060134989320467888
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -230,7 +245,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: c8417baf8f301a849ad7712f128b931a, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c8417baf8f301a849ad7712f128b931a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -410,8 +425,3 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: bc29f2447c3c7ec4a84955979decd353, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4fd56976905e56e4d8f1ce4a19c8c262, type: 3}
---- !u!1 &5214686040804486468 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 4fd56976905e56e4d8f1ce4a19c8c262, type: 3}
-  m_PrefabInstance: {fileID: 4944706661569515541}
-  m_PrefabAsset: {fileID: 0}

@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -40,13 +38,14 @@ public class Player : MonoBehaviour
     private float positionY;
     private bool tabooOnMove;
     private bool onGame;
-
+    
     private bool m_IsSwiping = false;
     private Vector2 m_StartingTouch;
     private float lastMovidPlayerSpeed;
     private float countCrash;
     private int chooseAnimation;
     private Quaternion startRotation = Quaternion.Euler(0, 130, 0);
+    public bool isChange;
 
     void Start()
     {
@@ -57,6 +56,7 @@ public class Player : MonoBehaviour
         m_TargetPosition = new Vector3(0, positionY, 0);
         healthPlayer = 1;
         m_IsFly = false;
+        //EventManager.ChangeRoad = ChangeRoad;
 
         if (gameManager.test)
         {
@@ -100,6 +100,7 @@ public class Player : MonoBehaviour
         {
            NoGravity();
         }
+      
 #else
         
         if (Input.touchCount == 1)
@@ -156,10 +157,9 @@ public class Player : MonoBehaviour
         }
 #endif
         onGame = gameManager.game;
+       
         m_TargetPosition = new Vector3(m_TargetPosition.x, positionY, m_TargetPosition.z);
         
-       // if (burable || doubleMutagen || isNoGravityBaff)
-            //StartCoroutine(TimeBuff());
         
         
         healthPlayer = Mathf.Clamp(healthPlayer, -1, 1);
@@ -189,10 +189,51 @@ public class Player : MonoBehaviour
        
         if (Math.Round(transform.position.y - 0.1f, 1) > positionY) m_IsFly = true;  //-0.7
         else m_IsFly = false;
+
+        float x = transform.position.x;
+        x = Mathf.Abs(x);
+        if (x > 0.1f & x < 0.9)
+        {
+            isChange = true;
+        }
+        else isChange = false;
+
     }
     
+    private void ChangeRoad(string type, string form)
+    {
+        switch (type)
+            {
+                case "up":
+                    /*if (!m_IsFly & form != "rise")
+                    {
+                        if(m_CurrentLane == 2)
+                            ChangeLane(-1);
+                        else if(m_CurrentLane == 0)
+                            ChangeLane(1);
+                    }*/
+                    if (transform.position.y < -0.65f & form != "rise")
+                    {
+                        if (m_CurrentLane == 2)
+                            ChangeLane(-1);
+                        else if (m_CurrentLane == 0)
+                            ChangeLane(1);
+                    }
+                    else
+                    {
+                        positionY += 0.33f;
+                    }
 
-   
+                    break;
+                case "down":
+                    positionY -= 0.33f;
+                    break;
+            }
+
+
+        positionY = Mathf.Clamp(positionY, -1, -0.67f);
+    }
+    
     public void Jump()
     {
         if(m_IsFly || tabooOnMove || !onGame) return;
@@ -210,8 +251,12 @@ public class Player : MonoBehaviour
     public void ChangeLane(int direction)
     {
         if(IsNoGravity || tabooOnMove || !onGame) return;
-
+        
         int targetLane = m_CurrentLane + direction;
+        
+        
+        //ChangeRoad(m_CurrentLane, direction, "Change");
+        
         if (targetLane < 0 || targetLane > 2)
             return;
         m_CurrentLane = targetLane;
@@ -232,27 +277,13 @@ public class Player : MonoBehaviour
                 break;
         }
         
-        if(direction > 0) animator.SetTrigger("right");
-        if(direction < 0) animator.SetTrigger("left");
+        
+        if(direction > 0 & !m_IsFly) animator.SetTrigger("right");
+        if(direction < 0& !m_IsFly) animator.SetTrigger("left");
     }
 
-    
-    
     private void OnTriggerEnter(Collider col)
     {
-        
-        /*if (col.gameObject.CompareTag(""))
-        {
-            positionY = -0.708f;
-            Debug.Log("Pos");
-        }
-
-        if (col.gameObject.CompareTag("UpTrack"))
-        {
-            positionY = -0.32f;
-            Debug.Log("UpPos");
-        }*/
-
         switch (col.gameObject.tag)
         {
             case "Barrier":
@@ -267,9 +298,8 @@ public class Player : MonoBehaviour
                 else if (gameManager.test)
                 {
                     countCrash++;
-                    Debug.LogError("Game over: " + countCrash);
+                    Debug.LogWarning("Game over: " + countCrash);
                 }
-                
                 break;
             case "Mutagen":
                 if (gameManager.buffs[1])
@@ -284,15 +314,23 @@ public class Player : MonoBehaviour
                 }
                 Destroy(col.gameObject);
                 break;
-            case "Target":
-                //Target target = col.gameObject.GetComponent<Target>();
-                
-                break;
             case "PaulHole":
                 tabooOnMove = true;
                 camera.MoveHole();
                 break;
-            
+            case "Road":
+                if(isChange) ChangeRoad("up", "plain");
+                if (!isChange) isChange = true;
+                break;
+            case "EndRoad": 
+                ChangeRoad("down", "rise");
+                break;
+            case "BeginRoad":
+                ChangeRoad("up", "rise");
+                break;
+            case "Change":
+                //EventManager.ChangeRoad(m_CurrentLane, "Change");
+                break;
         }
         /* if (col.gameObject.CompareTag("Rise"))
          {
@@ -309,6 +347,7 @@ public class Player : MonoBehaviour
              //m_TargetPosition = new Vector3(transform.position.x, -0.708f, 4.31f);
          }*/
     }
+    
 
     private void OnTriggerExit(Collider other)
     {
@@ -316,8 +355,13 @@ public class Player : MonoBehaviour
         {
             tabooOnMove = false;
         }
+
+        if (other.gameObject.CompareTag($"Road"))
+        {
+            if(isChange) ChangeRoad("down", "plane");
+        }
     }
-    
+
     public void NoGravity()
     {
         if(!isNoGravityBaff || tabooOnMove || !onGame) return;
@@ -345,7 +389,12 @@ public class Player : MonoBehaviour
         vetricalQuaternion = Quaternion.Euler(0, 0, 0);
     }
 
-    
+    IEnumerator Change()
+    {
+        yield return new WaitForSeconds(0.2f);
+        isChange = false;
+    }
+
     /*IEnumerator MovedPlayerSpeed()
     {
         MovidPlayerSpeed = 1.5f;

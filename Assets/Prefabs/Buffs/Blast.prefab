@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 717865332351832680}
   - component: {fileID: 2067520914018951028}
   - component: {fileID: -1337305553848861946}
-  - component: {fileID: 6064021601072180374}
   m_Layer: 0
   m_Name: Blast
   m_TagString: Buff
@@ -112,19 +111,3 @@ MonoBehaviour:
   buff: {fileID: 0}
   options: 1
   player: {fileID: 0}
---- !u!54 &6064021601072180374
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1981803245482172442}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0

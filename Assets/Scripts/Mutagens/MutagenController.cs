@@ -26,6 +26,19 @@ public class MutagenController : MonoBehaviour
         randomTimeAmidMutagens = Random.Range(3, 7);
     }
 
+    private void Update()
+    {
+        if (transform.childCount > 45)
+        {
+            DestroyMetagen();
+        }
+    }
+
+    private void DestroyMetagen()
+    {
+        Destroy(transform.GetChild(0).gameObject); 
+    }
+
     public void Spawn()
     {
 

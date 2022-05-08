@@ -95,35 +95,11 @@ public class PaulsController : MonoBehaviour
         
         Paul newPaul = Instantiate(Pauls[1], transform, true);
         
-        switch (gameManager.direction)
-        {
-            case 0:
-                newPaul.transform.position = lastPaul.transform.position + new Vector3(0, 0, 0.989f);
-                break;
-            case 1:
-                newPaul.transform.position = lastPaul.transform.position + new Vector3(0.989f, 0, 0);
-                newPaul.transform.rotation = Quaternion.Euler(0, newPaul.transform.rotation.eulerAngles.y + 90, 0);
-                break;
-            case 2:
-                newPaul.transform.position = lastPaul.transform.position + new Vector3(0, 0, -0.989f);
-                newPaul.transform.rotation = Quaternion.Euler(0, newPaul.transform.rotation.eulerAngles.y + 180, 0);
-                break;
-            case 3:
-                newPaul.transform.position = lastPaul.transform.position + new Vector3(-0.989f, 0, 0);
-                newPaul.transform.rotation = Quaternion.Euler(0, newPaul.transform.rotation.eulerAngles.y - 90, 0);
-                break;
-        }
-
-        lastPaul = newPaul;
-
-        
-
-        if (countPauls == 0)
+       if (countPauls == 0)
         {
             countPauls = Random.Range(3, 7);
             countBarriers = Random.Range(1, 3);
-            
-            
+
             for (int i = 0; i < countBarriers; i++)
             {
                 numberBarrier = Mathf.RoundToInt(ChooseBarriers(oddsBarriers));
@@ -185,8 +161,31 @@ public class PaulsController : MonoBehaviour
         }
         else
         {
+            GeneratorMilieu generatorMilieu = newPaul.GetComponent<GeneratorMilieu>();
+            generatorMilieu.Generate();
             countPauls--;
         }
+        
+        switch (gameManager.direction) // решить
+        {
+            case 0:
+                newPaul.transform.position = lastPaul.transform.position + new Vector3(0, 0, 0.989f);
+                break;
+            case 1:
+                newPaul.transform.position = lastPaul.transform.position + new Vector3(0.989f, 0, 0);
+                newPaul.transform.rotation = Quaternion.Euler(0, newPaul.transform.rotation.eulerAngles.y + 90, 0);
+                break;
+            case 2:
+                newPaul.transform.position = lastPaul.transform.position + new Vector3(0, 0, -0.989f);
+                newPaul.transform.rotation = Quaternion.Euler(0, newPaul.transform.rotation.eulerAngles.y + 180, 0);
+                break;
+            case 3:
+                newPaul.transform.position = lastPaul.transform.position + new Vector3(-0.989f, 0, 0);
+                newPaul.transform.rotation = Quaternion.Euler(0, newPaul.transform.rotation.eulerAngles.y - 90, 0);
+                break;
+        }
+
+        lastPaul = newPaul;
     }
 
     private void DestoryPauls()

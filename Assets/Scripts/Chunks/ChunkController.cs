@@ -26,13 +26,15 @@ public class ChunkController : MonoBehaviour
     [SerializeField] private Chunk startChunk;
     [SerializeField] private GameObject mainTube;
     [SerializeField] private int BeforeDouble;
-    
+
+    private RoadController roadController;
     private float nextActionTimeAddSpeed;
     private float addSpeed;
     private int countChunksBeforeDouble;
 
     void Start()
     {
+        roadController = FindObjectOfType<RoadController>();
         paulsController = GetComponentInChildren<PaulsController>();
         addSpeed = 0.104f;
         numberAddSpeed = 0.0005f;
@@ -41,8 +43,9 @@ public class ChunkController : MonoBehaviour
        // StartCoroutine(DoudleTubeSpawn());
         isSpawnPermit = true;
         position.y = 0;
-        countChunksBeforeDouble = 0;
+        countChunksBeforeDouble = BeforeDouble;
     }
+
 
     void FixedUpdate()
     {
@@ -86,8 +89,9 @@ public class ChunkController : MonoBehaviour
             }
         }
 
-        if (spawnChunks.Count > 20)
+        if (spawnChunks.Count > 14)
         {
+            
             DestoryChunk();
         }
 
@@ -119,11 +123,18 @@ public class ChunkController : MonoBehaviour
 
         Chunk newChunk = Instantiate(ChunksPrefabs[choose], mainTube.transform, true);
         Vector3 lastPosition = spawnChunks[spawnChunks.Count - 1].transform.position;
+        if (!newChunk.isDoubleChunks) newChunk.generateMoss.CelectionPoint();
         
+        if (choose > 0)
+        {
+           // DoubleChunks doubleChunks = newChunk.doubleChunks;
+            //roadController.Replacement(doubleChunks.target.direction);
+        }
+
         switch (gameManager.direction)
         {
             case 0:
-                newChunk.transform.position = lastPosition + new Vector3(0, 0, 10);
+                newChunk.transform.position = lastPosition + new Vector3(0, 0, 10.35f); // 2.65
                 break;
             case 1:
                 newChunk.transform.rotation = Quaternion.Euler(0, newChunk.transform.rotation.eulerAngles.y + 90, 0);
@@ -143,6 +154,7 @@ public class ChunkController : MonoBehaviour
         spawnChunks.Add(newChunk);
     }
     
+
     private void DestoryChunk()
     {
         if (spawnChunks[0] != null)
