@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,13 +6,13 @@ using UnityEngine.Assertions.Must;
 
 public class Barrier : MonoBehaviour
 {
-    public int sameTypeDistation; // минимальное расстояние до barrer того же типа
-    public int anyTypeDistation; // минимальное расстояние до barrer любого типа
-    // typeBarriers
+    public int anyTypeDistance; // минимальное расстояние до Barrier любого типа
+    public int sameTypeDistance; // минимальное расстояние до Barrier того же типа
     public Vector3 offsetBarrier;
-    public bool oneCountBarriers = false;
-    public PossiblePosition possible;
+    public bool oneCountBarrier;
+    [HideInInspector] public bool isJob;
 
+    public PossiblePosition possible;
     public enum PossiblePosition
     {
         Neutral = 0,

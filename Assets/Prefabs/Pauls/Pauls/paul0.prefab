@@ -50,12 +50,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e903007a2b5c54e42b6cc37709bfea18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Begin: {fileID: 0}
-  End: {fileID: 2445153022919826480}
-  NumberBarriers:
+  numberBarriers:
   - {fileID: 7231021172733983376}
-  - {fileID: 2621549310550339476}
   - {fileID: 3640179936555625722}
+  - {fileID: 2621549310550339476}
+  barriers: []
+  numberBarriersInPool: 
 --- !u!114 &6685783487469559205
 MonoBehaviour:
   m_ObjectHideFlags: 0

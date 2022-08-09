@@ -2,13 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
+using static Randomize.GetRandom;
 
 public class PaulsController : MonoBehaviour
 {
     public Barrier[] BarriersPrefabs;
-    public Paul[] Pauls;
+    public Paul paulPrefab;
+    public GameObject barriersPool;
+    [HideInInspector] public Paul lastPaul;
     
     private ChunkController chunkController;
     private GameManager gameManager;
@@ -17,11 +21,46 @@ public class PaulsController : MonoBehaviour
 
     [Range(0, 100)] public float[] oddsBarriers;
     private int countPauls;
-    [HideInInspector] public Paul lastPaul;
+    
+    [SerializeField] private List<Paul> pauls;
+
+    [SerializeField] private Paul startPaul;
+    private PoolManager poolManager;
+    private int minAnyTypeDistance;
+    private int[] minSameTypeDistance;
+
+
+    private void Awake()
+    {
+        poolManager = FindObjectOfType<PoolManager>();
+        int maxValue = 0;
+        for (int u = 0; u < oddsBarriers.Length; u++)
+        {
+            if (oddsBarriers[u] > maxValue)
+            {
+                maxValue = (int)oddsBarriers[u];
+            }
+        }
+
+        maxValue += 3;
+        
+        poolManager.barriersPool = new Barrier[oddsBarriers.Length, maxValue];
+        for (int i = 0; i < oddsBarriers.Length; i++)
+        {
+            for (int j = 0; j <  maxValue; j++) // создавать в зависимости от odds barriers
+            {
+                if (oddsBarriers[i] == 0) continue;
+                Barrier newBarrier = Instantiate(BarriersPrefabs[i],  barriersPool.transform, true);
+                poolManager.barriersPool[i, j] = newBarrier;
+                newBarrier.gameObject.SetActive(false);
+            }
+        }
+    }
 
     private void Start()
     {
         countPaulsBetween = new int[BarriersPrefabs.Length];
+        minSameTypeDistance = new int[BarriersPrefabs.Length];
         for (int i = 0; i < BarriersPrefabs.Length; i++)
         {
             countPaulsBetween[i] = 0;
@@ -30,222 +69,164 @@ public class PaulsController : MonoBehaviour
         player = FindObjectOfType<Player>();
         gameManager = FindObjectOfType<GameManager>();
         chunkController = FindObjectOfType<ChunkController>();
-        lastPaul = Pauls[0];
+       
+        pauls.Add(startPaul);
+        lastPaul = startPaul;
+        for (int i = 0; i < 94; i++)
+        {
+            Paul newPaul = Instantiate(paulPrefab, transform, true);
+            pauls.Add(newPaul);
+            newPaul.transform.position = lastPaul.transform.position + new Vector3(0, 0, 0.989f);
+            if (i > 20)
+            {
+                GenerateBarrier(newPaul); 
+            }
+            lastPaul = newPaul;
+            
+        }
     }
-    
-    
     
 
     void Update()
     {
-        if (transform.childCount > 95)
+        float dist = Vector3.Distance(player.transform.position, lastPaul.transform.position);
+        if (dist < 70 && chunkController.isSpawnPermit)
         {
-            DestoryPauls();
+            GeneratePaul();
         }
-
-        if (chunkController.isSpawnPermit)
-        {
-            switch (gameManager.direction)
-            {
-                case 0:
-                    if (lastPaul.End.position.z < 55)
-                    {
-                        SpawnPauls();
-                    }
-
-                    break;
-                case 1:
-                    if (lastPaul.End.position.x < 55)
-                    {
-                        SpawnPauls();
-                    }
-
-                    break;
-                case 2:
-                    if (lastPaul.End.position.z > -55)
-                    {
-                        SpawnPauls();
-                    }
-
-                    break;
-                case 3:
-                    if (lastPaul.End.position.x > -55)
-                    {
-                        SpawnPauls();
-                    }
-
-                    break;
-            }
-        }
-
-        if (Input.GetKey(KeyCode.P))
-        {
-            SpawnPauls();
-        }
-        
     }
 
-    private void SpawnPauls()
+    private void GeneratePaul()
     {
-        int countBarriers;
-        int numberBarrier;
-        int positionBarrier = 0;
-        int busyPosition = 0;
-        Vector3 offset;
-        
-        Paul newPaul = Instantiate(Pauls[1], transform, true);
-        
-       if (countPauls == 0)
-        {
-            countPauls = Random.Range(3, 7);
-            countBarriers = Random.Range(1, 3);
-
-            for (int i = 0; i < countBarriers; i++)
-            {
-                numberBarrier = Mathf.RoundToInt(ChooseBarriers(oddsBarriers));
-                int sameType = BarriersPrefabs[numberBarrier].sameTypeDistation;
-                if (countPaulsBetween[numberBarrier] != 0 & sameType != 0)
-                {
-                    countPaulsBetween[numberBarrier]--;
-                    numberBarrier = Generator(numberBarrier, "paul");
-                }
-
-
-                Barrier barrier = Instantiate(BarriersPrefabs[numberBarrier], newPaul.transform, true);
-
-                if (sameType != 0)
-                {
-                    countPaulsBetween[numberBarrier] = sameType;
-                }
-
-                if ((barrier.oneCountBarriers & i > 0))
-                {
-                    Destroy(barrier.gameObject);
-                    break;
-                }
-
-                offset = barrier.offsetBarrier;
-                
-                switch (barrier.possible)
-                {
-                    case Barrier.PossiblePosition.Neutral:
-                        positionBarrier = Random.Range(0, 3);
-                        if (i == 0) busyPosition = positionBarrier;
-                        else if (i == 1)
-                        {
-                            if (busyPosition == positionBarrier)
-                            {
-                                positionBarrier = Generator(busyPosition, "position");
-                            }
-                        }
-                        break;
-                    
-                    case Barrier.PossiblePosition.Center:
-                        positionBarrier = 0;
-                        break;
-                    case Barrier.PossiblePosition.Right:
-                        positionBarrier = 1;
-                        break;
-                    case Barrier.PossiblePosition.Left:
-                        positionBarrier = 2;
-                        break;
-                }
-
-                if(newPaul.NumberBarriers.Length > 0) barrier.transform.position = newPaul.NumberBarriers[positionBarrier].transform.position + offset;
-                
-                var rotationBarrier = barrier.transform.rotation.eulerAngles;
-                barrier.transform.rotation = Quaternion.Euler(rotationBarrier.x, rotationBarrier.y + newPaul.transform.rotation.eulerAngles.y,rotationBarrier.z);
-                if (barrier.anyTypeDistation != 0) countPauls = barrier.anyTypeDistation;
-                if(barrier.oneCountBarriers) break;
-            }
-        }
-        else
-        {
-            GeneratorMilieu generatorMilieu = newPaul.GetComponent<GeneratorMilieu>();
-            generatorMilieu.Generate();
-            countPauls--;
-        }
-        
-        switch (gameManager.direction) // решить
-        {
-            case 0:
-                newPaul.transform.position = lastPaul.transform.position + new Vector3(0, 0, 0.989f);
-                break;
-            case 1:
-                newPaul.transform.position = lastPaul.transform.position + new Vector3(0.989f, 0, 0);
-                newPaul.transform.rotation = Quaternion.Euler(0, newPaul.transform.rotation.eulerAngles.y + 90, 0);
-                break;
-            case 2:
-                newPaul.transform.position = lastPaul.transform.position + new Vector3(0, 0, -0.989f);
-                newPaul.transform.rotation = Quaternion.Euler(0, newPaul.transform.rotation.eulerAngles.y + 180, 0);
-                break;
-            case 3:
-                newPaul.transform.position = lastPaul.transform.position + new Vector3(-0.989f, 0, 0);
-                newPaul.transform.rotation = Quaternion.Euler(0, newPaul.transform.rotation.eulerAngles.y - 90, 0);
-                break;
-        }
-
-        lastPaul = newPaul;
+        if(pauls[0].barriers.Count > 0) DestroyBarrier(pauls[0]);
+        pauls[0].transform.rotation = Quaternion.Euler(0, gameManager.ChooiseDirectionRotarion(), 0);
+        pauls[0].transform.position = lastPaul.transform.position + gameManager.ChooiseDirectionPosition(0.989f);
+        GenerateBarrier(pauls[0]); 
+        lastPaul = pauls[0];
+        pauls.Add(pauls[0]);
+        pauls.RemoveAt(0);
+       
     }
 
-    private void DestoryPauls()
+    public void GenerateBarrier(Paul newPaul)
     {
-       Destroy(transform.GetChild(0).gameObject); 
-    }
+        int numberBarrier = ChoiсeBarrier(newPaul);
+        if(numberBarrier < 0 ) return;
+        newPaul.countBarriers++;
 
-    public int Generator(int unwanted, string name)
-    {
-        int number = 0;
-        int counter = 0;
-        while (true)
+        int place = ChoicePossiblePosition(numberBarrier, newPaul);
+        newPaul.busyNumberBarriers[place] = true;
+        if(place < 0) return;
+
+        Barrier barrier = null;
+        for (int o = 0; o < poolManager.barriersPool.GetLength(1); o++)
         {
-            if (name == "paul")
+            if (poolManager.barriersPool[numberBarrier, o] == null)
             {
-                number = Mathf.RoundToInt(ChooseBarriers(oddsBarriers));
+                poolManager.barriersPool[numberBarrier, o] = Instantiate(BarriersPrefabs[numberBarrier], barriersPool.transform, true);
             }
-            else if( name == "position")
+            if (!poolManager.barriersPool[numberBarrier, o].isJob)
             {
-                number = Random.Range(0, 3);
-            }
-            else
-            {
-                Debug.Log("Error name!");
-                break;
-            }
-            if (number != unwanted) break;
-            counter++;
-            if (counter > 500)
-            {
-                Debug.LogError("while!");
+                barrier = poolManager.barriersPool[numberBarrier, o];
+                barrier.isJob = true;
                 break;
             }
         }
-        return number;
+
+        if (barrier == null)
+        {
+            //Debug.Log(numberBarrier);
+            barrier = Instantiate(BarriersPrefabs[numberBarrier], barriersPool.transform.GetChild(numberBarrier),
+                true); //количество барьеров создается меньше, чем нужжно
+        }
+        
+        
+        
+        barrier.transform.SetParent(newPaul.transform);
+        barrier.transform.position = newPaul.numberBarriers[place].transform.position + barrier.offsetBarrier; 
+        barrier.gameObject.SetActive(true);
+        newPaul.barriers.Add(barrier);
+        newPaul.numberBarriersInPool.Add(numberBarrier);
+        
+        if(newPaul.countBarriers < 2) GenerateBarrier(newPaul);
+        pauls[0].countBarriers = 0;
+        pauls[0].busyNumberBarriers = new[] {false, false, false};
     }
-    
-    
-    public float ChooseBarriers(float[] probs)
+
+    public void DestroyBarrier(Paul newPaul)
     {
-
-        float total = 0;
-        foreach (float elem in probs)
+        for (int i = 0; i < newPaul.barriers.Count; i++)
         {
-            total += elem;
+            newPaul.barriers[i].transform.SetParent(barriersPool.transform);
+            newPaul.barriers[i].gameObject.SetActive(false);
+            newPaul.barriers[i].isJob = false;
+            newPaul.barriers.RemoveAt(i);
+        }
+    }
+
+    private int ChoiсeBarrier(Paul paul)
+    {
+        int numberBarrier = (int) Choose(oddsBarriers);
+        if (paul.countBarriers == 0)
+        {
+            if (BarriersPrefabs[numberBarrier].oneCountBarrier) paul.countBarriers = 2;
+            else paul.countBarriers += Random.Range(0, 2);
+            //Debug.Log(countBarriersInPaul);
+        }
+        
+        if (minAnyTypeDistance > 0)
+        {
+            minAnyTypeDistance--;
+            return -1;
+        }
+        else minAnyTypeDistance = BarriersPrefabs[numberBarrier].anyTypeDistance;
+
+        if (minSameTypeDistance[numberBarrier] > 0)
+        {
+            minSameTypeDistance[numberBarrier]--;
+            for (int i = 0; i < oddsBarriers.Length; i++)
+            {
+                numberBarrier = (int)ChooseException(oddsBarriers, numberBarrier);
+                if(minSameTypeDistance[numberBarrier] == 0) break;
+            }
+            
+        }
+        else minSameTypeDistance[numberBarrier] = BarriersPrefabs[numberBarrier].sameTypeDistance;
+        
+        return numberBarrier;
+    }
+
+    private int ChoicePossiblePosition(int numberBarrier, Paul paul)
+    {
+        int position = 0;
+        switch (BarriersPrefabs[numberBarrier].possible)
+        {
+            case Barrier.PossiblePosition.Neutral:
+                position = Random.Range(0, 3);
+                if (paul.busyNumberBarriers[position])
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        position = Random.Range(0, 3);
+                        if(!paul.busyNumberBarriers[position]) break;
+                    }
+                }
+                break;
+            case Barrier.PossiblePosition.Center:
+                position = 0;
+                if (paul.busyNumberBarriers[position]) return -1;
+                break;
+            case Barrier.PossiblePosition.Right:
+                position = 1;
+                if (paul.busyNumberBarriers[position]) return -1;
+                break;
+            case Barrier.PossiblePosition.Left:
+                position = 2;
+                if (paul.busyNumberBarriers[position]) return -1;
+                break;
         }
 
-        float randomPoint = Random.value * total;
-
-        for (int i = 0; i < probs.Length; i++)
-        {
-            if (randomPoint < probs[i])
-            {
-                return i;
-            }
-            else
-            {
-                randomPoint -= probs[i];
-            }
-        }
-        return probs.Length - 1;
+        
+        return position;
     }
 }

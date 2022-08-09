@@ -18,11 +18,11 @@ public class BuffController : MonoBehaviour
 
     private void Start()
     {
-        gameManager = FindObjectOfType<GameManager>();
-        Spawn();
+        //gameManager = FindObjectOfType<GameManager>();
+       // Spawn();
     }
 
-    private void Update()
+    /*private void Update()
     {
         if (buffInScene != null)
         {
@@ -54,7 +54,7 @@ public class BuffController : MonoBehaviour
                     break;
             }
         }
-    }
+    }*/
 
     public void Spawn()
     { 

@@ -1,10 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Randomaze;
+using Randomize;
 using Unity.Mathematics;
 using UnityEngine;
-using static Randomaze.GetRandom;
+using static Randomize.GetRandom;
 using Random = UnityEngine.Random;
 using Vector2 = System.Numerics.Vector2;
 
@@ -22,6 +22,7 @@ public class GenerateMoss : MonoBehaviour
     void Start()
     { 
         //CelectionPoint();
+        //Совесм другая система - сгенерировать в самом начале и потом переставлять. 
     }
 
     public void CelectionPoint()
@@ -40,7 +41,7 @@ public class GenerateMoss : MonoBehaviour
                 if (directionRay.x > 0) sing = 1; else sing = -1;
                 if (directionRay.y > 0) // изогнутая
                 {
-                    if (directionRay.y > 0.68 && GetChooise(50))
+                    if (directionRay.y > 0.68 && GetChoice(50))
                     {
                         int j = 0;
                         moss = Instantiate(mossPrefabs[2].transform.GetChild(3).gameObject, transform);

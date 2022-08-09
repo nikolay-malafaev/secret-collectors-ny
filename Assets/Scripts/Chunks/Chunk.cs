@@ -8,8 +8,6 @@ using Random = UnityEngine.Random;
 
 public class Chunk : MonoBehaviour
 {
-    public Transform Begin;
-    public Transform End;
     public bool isDoubleChunks;
     [HideInInspector] public DoubleChunks doubleChunks;
     public GenerateMoss generateMoss;
@@ -17,7 +15,6 @@ public class Chunk : MonoBehaviour
     private void Awake()
     {
         if (isDoubleChunks) doubleChunks = GetComponent<DoubleChunks>();
-        
     }
 }
 
