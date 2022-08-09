@@ -99,3 +99,4 @@ MonoBehaviour:
   offsetBarrier: {x: 0, y: 0, z: 0}
   oneCountBarriers: 1
   possible: 2
+  id: 13

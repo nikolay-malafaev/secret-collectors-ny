@@ -9,7 +9,9 @@ public class GeneratorMilieu : MonoBehaviour
     [SerializeField] private GameObject[] milieusPrefabs;
     [SerializeField] private int maxCountMilieus;
     private int number;
-
+    
+    //генерировать так же как и мох в самом начале
+    
     public void Generate()
     {
         

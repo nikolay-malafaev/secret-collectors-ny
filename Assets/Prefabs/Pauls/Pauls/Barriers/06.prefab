@@ -44,10 +44,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7e4513212e974847afc1761753be228, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sameTypeDistation: 0
-  anyTypeDistation: 0
+  anyTypeDistance: 3
+  sameTypeDistance: 4
   offsetBarrier: {x: 0, y: 0.251, z: 0}
-  oneCountBarriers: 0
+  oneCountBarrier: 0
+  isJob: 0
   possible: 0
 --- !u!1 &6095493393987707075
 GameObject:

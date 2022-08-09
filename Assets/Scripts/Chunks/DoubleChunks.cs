@@ -6,42 +6,60 @@ using Random = UnityEngine.Random;
 
 public class DoubleChunks : MonoBehaviour
 {
-
-    public GameObject Pauls;
-    private ChunkController chunkController;
-    private PaulsController paulsController;
-    public Chunk newChunk;
-    public Paul attachingPaul; //
-    private int[] countPaulsBetween;
+    public List<Paul> pauls;
+    public GameObject stop;
     [HideInInspector] public Animator animator;
     [HideInInspector] public Target target;
-    private Paul lastPaul;
+    [HideInInspector] public float defoltEuler;
+    [SerializeField] private Chunk attachingChunk;
+    [SerializeField] private Paul lastPaul;
+    private ChunkController chunkController;
+    private PaulsController paulsController;
+    
+
+
+
 
     private void Awake()
     {
         target = GetComponentInChildren<Target>();
+        defoltEuler = transform.rotation.eulerAngles.y;
     }
 
     void Start()
     {
         target = GetComponentInChildren<Target>();
-        chunkController = GetComponentInParent<ChunkController>();
+        chunkController = FindObjectOfType<ChunkController>();
         animator = GetComponent<Animator>();
-        paulsController = chunkController.GetComponentInChildren<PaulsController>();
-        countPaulsBetween = new int[paulsController.BarriersPrefabs.Length];
-        StartCoroutine(SpawnPaulsTime());
-        lastPaul = attachingPaul;
+        
+        //paulsController = chunkController.GetComponentInChildren<PaulsController>();
+        for (int i = 0; i < 30; i++)
+        {
+            Paul newPaul = Instantiate(chunkController.paulsController.paulPrefab, chunkController.paulsController.gameObject.transform, true);
+            pauls.Add(newPaul);
+            switch (target.direction)
+            {
+                case Target.Direction.Right:
+                    newPaul.transform.rotation = Quaternion.Euler(0, 90, 0);
+                    newPaul.transform.position = lastPaul.transform.position + new Vector3(0.989f, 0, 0);
+                    break;
+                case Target.Direction.Left:
+                    newPaul.transform.rotation = Quaternion.Euler(0, -90, 0);
+                    newPaul.transform.position = lastPaul.transform.position + new Vector3(-0.989f, 0, 0);
+                    break;
+            }
+           
+            lastPaul = newPaul;
+        }
     }
-    
-    
+
+   
+
     public void TurnChunks(Target.Direction direction) 
     {
-        
         chunkController.isSpawnPermit = false;
-        newChunk.transform.SetParent(chunkController.transform);
-        chunkController.spawnChunks.Add(newChunk);
-        chunkController.isSpawnPermit = true;
-        paulsController.lastPaul = lastPaul;
+        chunkController.lastChunk = attachingChunk;
+        chunkController.paulsController.lastPaul = lastPaul;
 
         int lastDirection = chunkController.gameManager.direction;
         switch (direction)
@@ -64,15 +82,27 @@ public class DoubleChunks : MonoBehaviour
         }
         chunkController.gameManager.Turn(direction);
     }
-    
-    
-    IEnumerator SpawnPaulsTime()
+
+    public void BackToPool(int i)
     {
-        yield return new WaitForSeconds(1.1f);
-        SpawnPauls();
+        if (i == 0)
+        {
+            transform.SetParent(chunkController.pool.transform);
+            transform.gameObject.SetActive(false);
+            if (stop.activeSelf) stop.SetActive(false);
+            chunkController.isDoubleChunksInScene = false;
+            //return barriers;
+        }
+        else StartCoroutine(TimeBackToPool());
     }
 
-    private void SpawnPauls()
+    private IEnumerator TimeBackToPool()
+    {
+        yield return new WaitForSeconds(10);
+        BackToPool(0);
+    }
+
+    /*private void SpawnPauls()
     {
         int countPauls = 0;
         int countBarriers;
@@ -82,7 +112,7 @@ public class DoubleChunks : MonoBehaviour
         Vector3 offset;
         for (int i = 0; i < 30; i++)
         {
-            Paul newPaul = Instantiate(chunkController.paulsController.Pauls[1], Pauls.transform, true);
+            Paul newPaul = Instantiate(chunkController.paulsController.Pauls[1], pauls.transform, true);
             
             switch (target.direction)
             {
@@ -144,8 +174,8 @@ public class DoubleChunks : MonoBehaviour
                     countBarriers = Random.Range(1, 3);
                     for (int p = 0; p < countBarriers; p++)
                     {
-                        paulNumber = Mathf.RoundToInt( paulsController.ChooseBarriers(paulsController.oddsBarriers));
-                        if (countPaulsBetween[paulNumber] != 0 & paulsController.BarriersPrefabs[paulNumber].sameTypeDistation != 0)
+                        paulNumber = Mathf.RoundToInt( paulsController.Choose(paulsController.oddsBarriers));
+                        if (countPaulsBetween[paulNumber] != 0 & paulsController.BarriersPrefabs[paulNumber].sameTypeDistance != 0)
                         {
                             countPaulsBetween[paulNumber]--;
                             paulNumber = paulsController.Generator(paulNumber, "paul");
@@ -153,9 +183,9 @@ public class DoubleChunks : MonoBehaviour
 
                         Barrier barrier = Instantiate(paulsController.BarriersPrefabs[paulNumber], newPaul.transform, true);
  
-                        if (barrier.sameTypeDistation != 0) countPaulsBetween[paulNumber] = barrier.sameTypeDistation;
+                        if (barrier.sameTypeDistance != 0) countPaulsBetween[paulNumber] = barrier.sameTypeDistance;
 
-                        if ((barrier.oneCountBarriers & p > 0))
+                        if ((barrier.oneCountBarrier & p > 0))
                         {
                             Destroy(barrier.gameObject);
                             continue;
@@ -187,14 +217,14 @@ public class DoubleChunks : MonoBehaviour
                         }
 
                         barrier.transform.position =
-                            newPaul.NumberBarriers[positionBarrier].transform.position + offset;
+                            newPaul.numberBarriers[positionBarrier].transform.position + offset;
                         
                         var rotationBarrier = barrier.transform.rotation;
                         barrier.transform.rotation = Quaternion.Euler(rotationBarrier.x, rotationBarrier.y + newPaul.transform.rotation.eulerAngles.y,rotationBarrier.z);
                         
-                        if (barrier.anyTypeDistation != 0) countPauls = barrier.anyTypeDistation;
+                        if (barrier.anyTypeDistance != 0) countPauls = barrier.anyTypeDistance;
                         
-                        if(barrier.oneCountBarriers) break;
+                        if(barrier.oneCountBarrier) break;
                     }
                 }
                 else
@@ -203,5 +233,5 @@ public class DoubleChunks : MonoBehaviour
                 }
             }
         }
-    }
+    }*/
 }

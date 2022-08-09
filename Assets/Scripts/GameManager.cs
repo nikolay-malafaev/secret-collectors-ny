@@ -10,16 +10,17 @@ using UnityEventBus;
 public class GameManager : MonoBehaviour
 {
     public bool test;
-                             //     0
-    public int direction;   //     | 
-                            // 3 -   - 1
-                            //    |
-                            //    2
+    public int direction;
+    //     0
+    //     | 
+    // 3 -   - 1
+    //    |
+    //    2
     [HideInInspector] public bool game;
     [HideInInspector] public float[] globalTimeBuff;
-    
+
     [HideInInspector] public float time;
-    
+
     [SerializeField] private ChunkController chunkController;
     [SerializeField] private BuffController buffController;
     [SerializeField] private Player player;
@@ -29,11 +30,11 @@ public class GameManager : MonoBehaviour
     private bool timer;
     private int numberBuff;
     private GameObject ntv;
-    
+
     [SerializeField] private CameraController cameraController;
 
     [SerializeField] private GameObject tv;
-        //number:       0         1          2       3
+    //number:       0         1          2       3
     //type:    burable doubleMutagen blast  noGravity
     //timer:    true      true       false    true
 
@@ -51,9 +52,11 @@ public class GameManager : MonoBehaviour
         if (!test)
         {
             ntv = Instantiate(tv);
-            ntv.transform.position = new Vector3(-0.845f, -0.989f, 0.139f); // Vector3(-0.845000029,-0.989000022,0.138999999)
+            ntv.transform.position =
+                new Vector3(-0.845f, -0.989f, 0.139f); // Vector3(-0.845000029,-0.989000022,0.138999999)
             ntv.transform.rotation = new Quaternion(-0.293f, 0.643f, 0.643f, 0.293f);
         }
+
         direction = 0;
     }
 
@@ -68,8 +71,8 @@ public class GameManager : MonoBehaviour
             player.animator.SetTrigger("fall");
         }
 
-       
-        
+
+
         switch (direction) // сделать поворот света direction
         {
             case 0:
@@ -81,8 +84,8 @@ public class GameManager : MonoBehaviour
             case 3:
                 break;
         }
-        
-       
+
+
         /* if (PlayerPrefs.GetFloat($"distation") < Mathf.Abs(tubeController.positionTubeZ))
          {
              PlayerPrefs.SetFloat($"distation", Mathf.Round(Mathf.Abs(tubeController.positionTubeZ)));
@@ -103,6 +106,7 @@ public class GameManager : MonoBehaviour
     {
         PlayerPrefs.SetInt("colMutagen", PlayerPrefs.GetInt("colMutagen") + countOneAdd);
     }
+
     public void Pause()
     {
         chunkController.pausePosition = !chunkController.pausePosition;
@@ -111,14 +115,14 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 1;
         else Time.timeScale = 0;
     }
-    
+
     public void ResetScene()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         Time.timeScale = 1;
     }
-    
-    public void Buffs(string nameBuff,  bool isTimer)
+
+    public void Buffs(string nameBuff, bool isTimer)
     {
         int numberBuff = -1;
         switch (nameBuff)
@@ -128,7 +132,7 @@ public class GameManager : MonoBehaviour
                 break;
             case "doubleMutagen":
                 numberBuff = 1;
-            break;
+                break;
             case "blast":
                 numberBuff = 2;
                 buffController.Blast();
@@ -138,7 +142,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        
+
         buffs[numberBuff] = true;
         if (isTimer & numberBuff > -1)
         {
@@ -148,6 +152,7 @@ public class GameManager : MonoBehaviour
             time = 1;
             StartCoroutine(TimeBuff(isTimer, numberBuff));
         }
+
         UI.BuffsUI(isTimer, timer, numberBuff);
     }
 
@@ -158,7 +163,7 @@ public class GameManager : MonoBehaviour
         buffs[number] = false;
         UI.BuffsUI(isTimer, timer, number);
     }
-    
+
     //Prefab
     /*
      *  switch (gameManager.direction)
@@ -177,10 +182,10 @@ public class GameManager : MonoBehaviour
     public void Turn(Target.Direction directionTurn)
     {
         Transform mainSpawn = MainSpawn.transform;
-        
+
         if (direction == -1) direction = 3;
         if (direction == 4) direction = 0;
-      
+
         light.transform.SetParent(player.transform);
         StartCoroutine(timeAften(0.37f));
         switch (direction)
@@ -202,12 +207,59 @@ public class GameManager : MonoBehaviour
                 mainSpawn.rotation = Quaternion.Euler(0, -90, 0);
                 break;
         }
+
         buffController.Spawn();
     }
+
+    public Vector3 ChooiseDirectionPosition(float number)
+    {
+         Vector3 position = new Vector3();
+         switch (direction)
+         {
+             case 0:
+                 position.z = number;
+                 break;
+             case 1:
+                 position.x = number;
+                 break;
+             case 2:
+                 position.z = -number;
+                 break;
+             case 3:
+                 position.x = -number;
+                 break;
+            
+         }
+         return position;
+    }
+
+    public float ChooiseDirectionRotarion()
+    {
+        float y = 0;
+        switch (direction)
+        {
+            case 0:
+                y = 0;
+                break;
+            case 1:
+                y = 90;
+                break;
+            case 2:
+                y = 180;
+                break;
+            case 3:
+                y = - 90;
+                break; 
+        }
+        //euler = Quaternion.Euler(0, y, 0);
+        return y;
+    }
+
 
     IEnumerator timeAften(float time)
     {
         yield return new WaitForSeconds(time);
+        chunkController.isSpawnPermit = true;
         light.transform.parent = null;
     }
 }
