@@ -251,6 +251,7 @@ MonoBehaviour:
   defoltEuler: 0
   attachingChunk: {fileID: 2560671879575786387}
   lastPaul: {fileID: 8172622106024862449}
+  paulsTransform: {fileID: 9137132265776142222}
 --- !u!95 &7109513629419224811
 Animator:
   serializedVersion: 3

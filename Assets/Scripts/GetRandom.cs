@@ -37,15 +37,15 @@ namespace Randomize
             }
             return probs.Length - 1;
         }
-        
-        public static float ChooseException(float[] currenProbability, int exception)
+        public static float ChooseException(float[] currenProbability, int type, int[,] exceptionArray)
         {
             float total = 0;
             float[] probability = new float[currenProbability.Length];
+            
 
             for (int i = 0; i < currenProbability.Length; i++)
             {
-                if (i != exception)
+                if (exceptionArray[type, i] == 0)
                 {
                     probability[i] = currenProbability[i];
                 }

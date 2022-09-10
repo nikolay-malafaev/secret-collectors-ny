@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Schema;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 using UnityEngine.Serialization;
@@ -9,7 +11,7 @@ using static Randomize.GetRandom;
 
 public class PaulsController : MonoBehaviour
 {
-    public Barrier[] BarriersPrefabs;
+    public Barrier[] barriersPrefabs;
     public Paul paulPrefab;
     public GameObject barriersPool;
     [HideInInspector] public Paul lastPaul;
@@ -26,8 +28,14 @@ public class PaulsController : MonoBehaviour
 
     [SerializeField] private Paul startPaul;
     private PoolManager poolManager;
-    private int minAnyTypeDistance;
-    private int[] minSameTypeDistance;
+    /// <summary>
+    /// 0 - singlePaul, 1 - doublePaul
+    /// </summary>
+    private int[] minAnyTypeDistance; 
+    /// <summary>
+    /// 0 - typePaul (single or doublePaul), 1 - minSameTypeDistance curren Paul
+    /// </summary>
+    private int[,] minSameTypeDistance;
 
 
     private void Awake()
@@ -50,7 +58,7 @@ public class PaulsController : MonoBehaviour
             for (int j = 0; j <  maxValue; j++) // создавать в зависимости от odds barriers
             {
                 if (oddsBarriers[i] == 0) continue;
-                Barrier newBarrier = Instantiate(BarriersPrefabs[i],  barriersPool.transform, true);
+                Barrier newBarrier = Instantiate(barriersPrefabs[i],  barriersPool.transform, true);
                 poolManager.barriersPool[i, j] = newBarrier;
                 newBarrier.gameObject.SetActive(false);
             }
@@ -59,9 +67,10 @@ public class PaulsController : MonoBehaviour
 
     private void Start()
     {
-        countPaulsBetween = new int[BarriersPrefabs.Length];
-        minSameTypeDistance = new int[BarriersPrefabs.Length];
-        for (int i = 0; i < BarriersPrefabs.Length; i++)
+        countPaulsBetween = new int[barriersPrefabs.Length];
+        minSameTypeDistance = new int[2, barriersPrefabs.Length];
+        minAnyTypeDistance = new int[2];
+        for (int i = 0; i < barriersPrefabs.Length; i++)
         {
             countPaulsBetween[i] = 0;
         }
@@ -81,8 +90,9 @@ public class PaulsController : MonoBehaviour
             {
                 GenerateBarrier(newPaul); 
             }
+
+            newPaul.typePaul = "singlePaul";
             lastPaul = newPaul;
-            
         }
     }
     
@@ -108,22 +118,32 @@ public class PaulsController : MonoBehaviour
        
     }
 
-    public void GenerateBarrier(Paul newPaul)
+    public void GenerateBarrier(Paul paul)
     {
-        int numberBarrier = ChoiсeBarrier(newPaul);
-        if(numberBarrier < 0 ) return;
-        newPaul.countBarriers++;
-
-        int place = ChoicePossiblePosition(numberBarrier, newPaul);
-        newPaul.busyNumberBarriers[place] = true;
-        if(place < 0) return;
+        int numberBarrier = ChoiсeBarrier(paul);
+        
+        //if(numberBarrier < 0 || place < 0) return;
+        
+        if (numberBarrier < 0)
+        {
+            return;
+        }
+        int place = ChoicePossiblePosition(numberBarrier, paul);
+        
+        if (place < 0)
+        {
+            return;
+        }
+        
+        paul.busyNumberBarriers[place] = true;
+        paul.countBarriers++;
 
         Barrier barrier = null;
         for (int o = 0; o < poolManager.barriersPool.GetLength(1); o++)
         {
             if (poolManager.barriersPool[numberBarrier, o] == null)
             {
-                poolManager.barriersPool[numberBarrier, o] = Instantiate(BarriersPrefabs[numberBarrier], barriersPool.transform, true);
+                poolManager.barriersPool[numberBarrier, o] = Instantiate(barriersPrefabs[numberBarrier], barriersPool.transform, true);
             }
             if (!poolManager.barriersPool[numberBarrier, o].isJob)
             {
@@ -133,24 +153,24 @@ public class PaulsController : MonoBehaviour
             }
         }
 
-        if (barrier == null)
+        if (barrier == null) //когда количество барьеров создается меньше, чем нужжно
         {
             //Debug.Log(numberBarrier);
-            barrier = Instantiate(BarriersPrefabs[numberBarrier], barriersPool.transform.GetChild(numberBarrier),
-                true); //количество барьеров создается меньше, чем нужжно
+            barrier = Instantiate(barriersPrefabs[numberBarrier], barriersPool.transform.GetChild(numberBarrier),
+                true); 
         }
         
         
         
-        barrier.transform.SetParent(newPaul.transform);
-        barrier.transform.position = newPaul.numberBarriers[place].transform.position + barrier.offsetBarrier; 
+        barrier.transform.SetParent(paul.transform);
+        barrier.transform.position = paul.numberBarriers[place].transform.position + barrier.offsetBarrier; 
         barrier.gameObject.SetActive(true);
-        newPaul.barriers.Add(barrier);
-        newPaul.numberBarriersInPool.Add(numberBarrier);
+        paul.barriers.Add(barrier);
+        paul.numberBarriersInPool.Add(numberBarrier);
         
-        if(newPaul.countBarriers < 2) GenerateBarrier(newPaul);
+        if(paul.countBarriers < 2) GenerateBarrier(paul);
         pauls[0].countBarriers = 0;
-        pauls[0].busyNumberBarriers = new[] {false, false, false};
+        pauls[0].busyNumberBarriers = new[] {false, false, false, true};
     }
 
     public void DestroyBarrier(Paul newPaul)
@@ -166,43 +186,45 @@ public class PaulsController : MonoBehaviour
 
     private int ChoiсeBarrier(Paul paul)
     {
-        int numberBarrier = (int) Choose(oddsBarriers);
-        if (paul.countBarriers == 0)
-        {
-            if (BarriersPrefabs[numberBarrier].oneCountBarrier) paul.countBarriers = 2;
-            else paul.countBarriers += Random.Range(0, 2);
-            //Debug.Log(countBarriersInPaul);
-        }
+        int currenPaul = 0;
+        int numberBarrier;
+        if (paul.typePaul == "singlePaul") currenPaul = 0;
+        else if (paul.typePaul == "doublePaul") currenPaul = 1;
         
-        if (minAnyTypeDistance > 0)
+        if (minAnyTypeDistance[currenPaul] > 0 && paul.countBarriers == 0)
         {
-            minAnyTypeDistance--;
+            minAnyTypeDistance[currenPaul]--;
             return -1;
         }
-        else minAnyTypeDistance = BarriersPrefabs[numberBarrier].anyTypeDistance;
 
-        if (minSameTypeDistance[numberBarrier] > 0)
+
+        numberBarrier = (int)Choice();
+        if (minSameTypeDistance[currenPaul, numberBarrier] > 0)
         {
-            minSameTypeDistance[numberBarrier]--;
-            for (int i = 0; i < oddsBarriers.Length; i++)
-            {
-                numberBarrier = (int)ChooseException(oddsBarriers, numberBarrier);
-                if(minSameTypeDistance[numberBarrier] == 0) break;
-            }
+            minSameTypeDistance[currenPaul, numberBarrier]--;
+            numberBarrier = (int)ChooseException(currenPaul, numberBarrier);
+        }
+        minSameTypeDistance[currenPaul, numberBarrier] = barriersPrefabs[numberBarrier].sameTypeDistance;
+
+        if (paul.countBarriers == 0)
+        {
+            if (barriersPrefabs[numberBarrier].oneCountBarrier) paul.countBarriers = 2; // что есть второй barrier и он oneCount
+            else paul.countBarriers += Random.Range(0, 2);
+            minAnyTypeDistance[currenPaul] = barriersPrefabs[numberBarrier].anyTypeDistance;
             
         }
-        else minSameTypeDistance[numberBarrier] = BarriersPrefabs[numberBarrier].sameTypeDistance;
         
         return numberBarrier;
     }
 
-    private int ChoicePossiblePosition(int numberBarrier, Paul paul)
+    private int ChoicePossiblePosition(int numberBarrier, Paul paul) // если заята position, то нужно менять
     {
         int position = 0;
-        switch (BarriersPrefabs[numberBarrier].possible)
+        switch (barriersPrefabs[numberBarrier].possible)
         {
             case Barrier.PossiblePosition.Neutral:
                 position = Random.Range(0, 3);
+                
                 if (paul.busyNumberBarriers[position])
                 {
                     for (int i = 0; i < 3; i++)
@@ -213,7 +235,7 @@ public class PaulsController : MonoBehaviour
                 }
                 break;
             case Barrier.PossiblePosition.Center:
-                position = 0;
+                position = 0; 
                 if (paul.busyNumberBarriers[position]) return -1;
                 break;
             case Barrier.PossiblePosition.Right:
@@ -228,5 +250,67 @@ public class PaulsController : MonoBehaviour
 
         
         return position;
+    }
+
+    private float Choice()
+    {
+        float total = 0;
+        float[] probability = oddsBarriers;
+        
+        foreach (float elem in probability)
+        {
+            total += elem;
+        }
+            
+        float randomPoint = Random.value * total;
+
+        for (int i = 0; i < probability.Length; i++)
+        {
+            if (randomPoint < probability[i])
+            {
+                return i;
+            }
+            else
+            {
+                randomPoint -= probability[i];
+            }
+        }
+        return probability.Length - 1;
+    }
+    
+    private float ChooseException(int type, int exception)
+    {
+        float total = 0;
+        float[] probability = new float[oddsBarriers.Length];
+            
+
+        for (int i = 0; i < oddsBarriers.Length; i++)
+        {
+            if (i != exception)
+            {
+                probability[i] = oddsBarriers[i];
+            }
+            else probability[i] = 0;
+        }
+
+        foreach (float elem in probability)
+        {
+            total += elem;
+        }
+            
+        float randomPoint = Random.value * total;
+
+        for (int i = 0; i < probability.Length; i++)
+        {
+            if (randomPoint < probability[i])
+            {
+                return i;
+            }
+            else
+            {
+                randomPoint -= probability[i];
+            }
+        }
+        return probability.Length - 1;
     }
 }

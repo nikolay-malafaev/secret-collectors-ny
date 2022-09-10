@@ -83,6 +83,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7e4513212e974847afc1761753be228, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chance: 4
   anyTypeDistance: 3
   sameTypeDistance: 3
   offsetBarrier: {x: 0, y: 0.56, z: 0}
