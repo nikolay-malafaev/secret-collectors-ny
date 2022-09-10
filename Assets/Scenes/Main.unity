@@ -976,6 +976,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1 &176811707
 GameObject:
   m_ObjectHideFlags: 0
@@ -1994,8 +1996,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7514de2aa0e4d1d438f2dbcb1e322beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Begin: {fileID: 763197876}
-  End: {fileID: 694570274}
   isDoubleChunks: 0
   doubleChunks: {fileID: 0}
   generateMoss: {fileID: 0}
@@ -2094,6 +2094,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1 &303383740
 GameObject:
   m_ObjectHideFlags: 0
@@ -3783,6 +3785,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1 &630889473
 GameObject:
   m_ObjectHideFlags: 0
@@ -4233,6 +4237,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1 &714160295
 GameObject:
   m_ObjectHideFlags: 0
@@ -5249,6 +5255,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1 &827999953
 GameObject:
   m_ObjectHideFlags: 0
@@ -5886,6 +5894,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1 &960174944
 GameObject:
   m_ObjectHideFlags: 0
@@ -6437,6 +6447,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1 &1084072571
 GameObject:
   m_ObjectHideFlags: 0
@@ -6507,6 +6519,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1001 &1084318634
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11498,6 +11512,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1 &1128234417
 GameObject:
   m_ObjectHideFlags: 0
@@ -11647,6 +11663,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1 &1148456853
 GameObject:
   m_ObjectHideFlags: 0
@@ -11962,6 +11980,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1 &1208351854
 GameObject:
   m_ObjectHideFlags: 0
@@ -14204,48 +14224,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24c13fa9c82634c4ca24fe480c3c95cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BarriersPrefabs:
+  barriersPrefabs:
   - {fileID: 1485617431195372265, guid: c32474b31e21e0d4296b884b6d709841, type: 3}
   - {fileID: 5808046624769147206, guid: 1c3fb2d53b3c4874292eae3087f1715f, type: 3}
   - {fileID: -5518843081039916110, guid: c819749d84b1b484c865aab37aed3c64, type: 3}
-  - {fileID: -8235227523216080118, guid: 656d27092a4eda843ae89ebb9e3bae24, type: 3}
-  - {fileID: 3701645832387521969, guid: db56cb1bbf7428c43a9391a99dd83516, type: 3}
-  - {fileID: -7230968166130757245, guid: 10f1905f45a2adf47aada03f4c83e082, type: 3}
   - {fileID: 546488721707318502, guid: c3f32e94b727eb945bbcbb0698f5e411, type: 3}
   - {fileID: 4369863639426189837, guid: c5df7d8071fdac142acebb2b5bea614f, type: 3}
   - {fileID: -4001623215268319274, guid: 77ce6204a1987224eb51042e87496e13, type: 3}
-  - {fileID: -2712416698262586834, guid: 99594178991d55e458d9d17addeb8ca8, type: 3}
-  - {fileID: -7537895737159154310, guid: dd780421e10b6ce4ab922802905c4d3c, type: 3}
-  - {fileID: -6549506956048767977, guid: 1a0fda0c32b597e46804fb07dc24e6f4, type: 3}
+  - {fileID: 8882786485381588304, guid: 99594178991d55e458d9d17addeb8ca8, type: 3}
   - {fileID: -4113614789816911986, guid: 7cba1128f22ed674da4d26c5b0e09139, type: 3}
-  - {fileID: -2820211022985771770, guid: 7e818afce210c7a4d8023be0f22233e2, type: 3}
-  - {fileID: -9128975884858419803, guid: f4aefa5b8f7fa4a4386f896db5ce24fa, type: 3}
-  - {fileID: -7841773913394615567, guid: adfe8a424360d1744b7463aa3a4015be, type: 3}
-  - {fileID: 2210328885657855521, guid: 4b1d375225120504193b7d234fdef493, type: 3}
   - {fileID: 2441720759262546129, guid: f9774c43c4ef9bb418b70f336ec31f00, type: 3}
   - {fileID: 4701383138762777578, guid: 6df4e4e1aab166c42b22967f89de5506, type: 3}
   paulPrefab: {fileID: 8406499641985578409, guid: 5389454f0df430945af82076b2f46163, type: 3}
   barriersPool: {fileID: 753717355}
   lastPaul: {fileID: 0}
   oddsBarriers:
-  - 5
-  - 5
-  - 1.25
-  - 1.25
-  - 1.25
-  - 1.25
-  - 5
   - 3
+  - 4
   - 5
-  - 1.6
-  - 1.6
-  - 1.6
-  - 0
-  - 0
-  - 0
-  - 0
-  - 0
   - 2
+  - 2
+  - 4
+  - 2
+  - 1
+  - 1
   - 0
   pauls: []
   startPaul: {fileID: 1218897891}
@@ -15321,6 +15323,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1 &1963780145
 GameObject:
   m_ObjectHideFlags: 0
@@ -15529,8 +15533,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7514de2aa0e4d1d438f2dbcb1e322beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Begin: {fileID: 469928666}
-  End: {fileID: 765775560}
   isDoubleChunks: 0
   doubleChunks: {fileID: 0}
   generateMoss: {fileID: 0}
@@ -16505,6 +16507,8 @@ MonoBehaviour:
   barriers: []
   numberBarriersInPool: 
   busyNumberBarriers: 000000
+  countBarriers: 0
+  typePaul: 
 --- !u!1001 &2614604248026322486
 PrefabInstance:
   m_ObjectHideFlags: 0

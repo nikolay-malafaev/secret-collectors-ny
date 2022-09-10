@@ -56,6 +56,9 @@ MonoBehaviour:
   - {fileID: 2621549310550339476}
   barriers: []
   numberBarriersInPool: 
+  busyNumberBarriers: 00000000
+  countBarriers: 0
+  typePaul: 
 --- !u!114 &6685783487469559205
 MonoBehaviour:
   m_ObjectHideFlags: 0

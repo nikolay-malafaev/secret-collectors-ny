@@ -58,12 +58,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7e4513212e974847afc1761753be228, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  anyTypeDistance: 3
-  sameTypeDistance: 5
+  chance: 3
+  anyTypeDistance: 4
+  sameTypeDistance: 15
   offsetBarrier: {x: 0, y: 0.15, z: 0}
   oneCountBarrier: 0
   isJob: 0
-  possible: 1
+  possible: 0
 --- !u!1 &8751863423679679223
 GameObject:
   m_ObjectHideFlags: 0

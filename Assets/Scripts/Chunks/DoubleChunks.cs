@@ -13,6 +13,7 @@ public class DoubleChunks : MonoBehaviour
     [HideInInspector] public float defoltEuler;
     [SerializeField] private Chunk attachingChunk;
     [SerializeField] private Paul lastPaul;
+    [SerializeField] private Transform paulsTransform;
     private ChunkController chunkController;
     private PaulsController paulsController;
     
@@ -35,7 +36,7 @@ public class DoubleChunks : MonoBehaviour
         //paulsController = chunkController.GetComponentInChildren<PaulsController>();
         for (int i = 0; i < 30; i++)
         {
-            Paul newPaul = Instantiate(chunkController.paulsController.paulPrefab, chunkController.paulsController.gameObject.transform, true);
+            Paul newPaul = Instantiate(chunkController.paulsController.paulPrefab, paulsTransform, true);
             pauls.Add(newPaul);
             switch (target.direction)
             {
@@ -48,9 +49,11 @@ public class DoubleChunks : MonoBehaviour
                     newPaul.transform.position = lastPaul.transform.position + new Vector3(-0.989f, 0, 0);
                     break;
             }
-           
+
+            newPaul.typePaul = "doublePaul";
             lastPaul = newPaul;
         }
+        gameObject.SetActive(false);
     }
 
    

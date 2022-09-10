@@ -13,11 +13,13 @@ public class Paul : MonoBehaviour
     public Transform[] numberBarriers;
     public List<Barrier> barriers;
     public List<int> numberBarriersInPool;
-    [HideInInspector] public bool[] busyNumberBarriers = new bool[3];
+    public bool[] busyNumberBarriers = new bool[5];
     [HideInInspector] public int countBarriers;
+    [HideInInspector] public string typePaul;
 
     private void Start()
     {
         countBarriers = 0;
+        
     }
 }

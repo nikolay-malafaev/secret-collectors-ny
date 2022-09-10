@@ -59,7 +59,6 @@ public class ChunkController : MonoBehaviour
         {
             doubleChunks.Add(Instantiate(ChunksPrefabs[i], transform, true));
             doubleChunks[i - 1].gameObject.transform.SetParent(pool.transform);
-            doubleChunks[i - 1].gameObject.SetActive(false);
         }
     }
 
