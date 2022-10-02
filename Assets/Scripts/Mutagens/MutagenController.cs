@@ -20,10 +20,10 @@ public class MutagenController : MonoBehaviour
 
 
     private void Start()
-    {
+    { 
        // StartCoroutine(MutagenSpawn());
-       // isMutagen = "one";
-       // randomTimeAmidMutagens = Random.Range(3, 7);
+       //isMutagen = "one";
+       //randomTimeAmidMutagens = Random.Range(3, 7);
     }
 
     private void Update()

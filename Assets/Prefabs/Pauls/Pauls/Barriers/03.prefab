@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &9137515506388978182
 Transform:
   m_ObjectHideFlags: 0
@@ -114,7 +114,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &519547532838522732
 Transform:
   m_ObjectHideFlags: 0
@@ -210,7 +210,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4602241719104902516
 Transform:
   m_ObjectHideFlags: 0
@@ -298,6 +298,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5340722723141371126}
   - component: {fileID: -5518843081039916110}
+  - component: {fileID: 8825623236597791143}
   m_Layer: 0
   m_Name: 03
   m_TagString: Untagged
@@ -336,12 +337,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chance: 5
-  anyTypeDistance: 3
+  anyTypeDistance: 5
   sameTypeDistance: 6
   offsetBarrier: {x: 0, y: 0.157, z: 0}
   oneCountBarrier: 0
+  isMultiBarrier: 1
   isJob: 0
-  possible: 0
+  multiBarrier: {fileID: 0}
+  possible: 3
+--- !u!114 &8825623236597791143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5621700869416914665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d76d700ecc5db8439a124131d193a7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  barriers:
+  - {fileID: 6342172411831148315}
+  - {fileID: 496808504260190}
+  - {fileID: 2146073598830105225}
+  - {fileID: 1615789086335436386}
 --- !u!1 &6342172411831148315
 GameObject:
   m_ObjectHideFlags: 0
@@ -360,7 +380,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8441443168717764848
 Transform:
   m_ObjectHideFlags: 0

@@ -88,8 +88,10 @@ MonoBehaviour:
   sameTypeDistance: 3
   offsetBarrier: {x: 0, y: 0.56, z: 0}
   oneCountBarrier: 0
+  isMultiBarrier: 0
   isJob: 0
-  possible: 0
+  multiBarrier: {fileID: 0}
+  possible: 3
 --- !u!1001 &8430503212279790710
 PrefabInstance:
   m_ObjectHideFlags: 0

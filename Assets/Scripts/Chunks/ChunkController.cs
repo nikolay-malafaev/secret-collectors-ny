@@ -70,7 +70,7 @@ public class ChunkController : MonoBehaviour
             transform.position = new Vector3(position.x, position.y, position.z);
             position -= gameManager.ChooiseDirectionPosition(addSpeed);
             float dist = Vector3.Distance(player.transform.position, lastChunk.transform.position);
-            if (dist < 70)
+            if (dist < 50) // 70
             {
                 GenerateChunk();
                 if (GetChoice(Convert.ToInt32(oddsDoubleChunks)) && !isDoubleChunksInScene) GenerateDoubleChunk();

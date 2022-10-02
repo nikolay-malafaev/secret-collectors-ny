@@ -50,9 +50,11 @@ MonoBehaviour:
   anyTypeDistance: 3
   sameTypeDistance: 10
   offsetBarrier: {x: 0, y: 0, z: 0}
-  oneCountBarrier: 0
+  oneCountBarrier: 1
+  isMultiBarrier: 0
   isJob: 0
-  possible: 0
+  multiBarrier: {fileID: 0}
+  possible: 3
 --- !u!1 &4928368179878197061
 GameObject:
   m_ObjectHideFlags: 0

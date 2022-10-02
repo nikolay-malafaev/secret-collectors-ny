@@ -20,6 +20,5 @@ public class Paul : MonoBehaviour
     private void Start()
     {
         countBarriers = 0;
-        
     }
 }
