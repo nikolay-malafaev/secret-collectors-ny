@@ -91,6 +91,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2460821667431834253}
   - component: {fileID: 8882786485381588304}
+  - component: {fileID: 1917157912479623738}
   m_Layer: 0
   m_Name: 07
   m_TagString: Untagged
@@ -132,8 +133,26 @@ MonoBehaviour:
   sameTypeDistance: 9
   offsetBarrier: {x: 0, y: 0.076, z: 0}
   oneCountBarrier: 0
+  isMultiBarrier: 1
   isJob: 0
-  possible: 0
+  multiBarrier: {fileID: 0}
+  possible: 3
+--- !u!114 &1917157912479623738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2974675762266633481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d76d700ecc5db8439a124131d193a7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  barriers:
+  - {fileID: 6243405689819814405}
+  - {fileID: 968198871686942820}
+  - {fileID: 5979477421870132788}
 --- !u!1 &5979477421870132788
 GameObject:
   m_ObjectHideFlags: 0
@@ -232,7 +251,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5489480794365808944
 Transform:
   m_ObjectHideFlags: 0

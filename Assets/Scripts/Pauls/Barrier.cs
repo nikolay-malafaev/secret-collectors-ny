@@ -10,7 +10,9 @@ public class Barrier : MonoBehaviour
     public int sameTypeDistance; // минимальное расстояние до Barrier того же типа
     public Vector3 offsetBarrier;
     public bool oneCountBarrier;
+    public bool isMultiBarrier;
     [HideInInspector] public bool isJob;
+    [HideInInspector] public MultiBarrier multiBarrier;
     
     public PossiblePosition possible;
     public enum PossiblePosition
@@ -24,8 +26,13 @@ public class Barrier : MonoBehaviour
     //public bool haveСlones;
     //[ShowIf(ShowIfAttribute.ActionOnConditionFail.DontDraw, ShowIfAttribute.ConditionOperator.And, nameof(haveСlones))]
     //public Barrier clones;
-    
-    
+
+    private void Awake()
+    {
+        if (isMultiBarrier) multiBarrier = GetComponent<MultiBarrier>();
+    }
+
+
     [EditorButton("SetChance")]
     public void SetChance()
     {

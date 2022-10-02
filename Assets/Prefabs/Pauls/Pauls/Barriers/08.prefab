@@ -98,6 +98,8 @@ MonoBehaviour:
   anyTypeDistance: 0
   sameTypeDistance: 0
   offsetBarrier: {x: 0, y: 0, z: 0}
-  oneCountBarrier: 0
+  oneCountBarrier: 1
+  isMultiBarrier: 0
   isJob: 0
-  possible: 2
+  multiBarrier: {fileID: 0}
+  possible: 0
