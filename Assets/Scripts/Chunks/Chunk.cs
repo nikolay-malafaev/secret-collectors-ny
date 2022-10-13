@@ -10,11 +10,12 @@ public class Chunk : MonoBehaviour
 {
     public bool isDoubleChunks;
     [HideInInspector] public DoubleChunks doubleChunks;
-    public GenerateMoss generateMoss;
+    [HideInInspector] public GenerateMoss generateMoss;
 
     private void Awake()
     {
         if (isDoubleChunks) doubleChunks = GetComponent<DoubleChunks>();
+        generateMoss = GetComponent<GenerateMoss>();
     }
 }
 

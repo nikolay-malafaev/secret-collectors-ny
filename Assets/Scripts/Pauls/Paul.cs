@@ -16,9 +16,5 @@ public class Paul : MonoBehaviour
     public bool[] busyNumberBarriers = new bool[5];
     [HideInInspector] public int countBarriers;
     [HideInInspector] public string typePaul;
-
-    private void Start()
-    {
-        countBarriers = 0;
-    }
+    public GeneratorMilieu generatorMilieu;
 }

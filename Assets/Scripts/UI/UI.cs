@@ -30,9 +30,9 @@ public class UI : MonoBehaviour
 
     void Update()
     {
-        //ui.thisDistation.text = Mathf.Round(Mathf.Abs(tubeController.positionTubeZ)).ToString();
-        //ui.maxDistationInGame.text = PlayerPrefs.GetFloat($"distation").ToString();
-        //ui.thisColMutagen.text = player.colMutagen.ToString();
+        ui.thisDistation.text = Mathf.Round(Mathf.Abs(chunkController.transform.position.z)).ToString();
+        ui.maxDistationInGame.text = PlayerPrefs.GetFloat($"distation").ToString();
+        ui.thisColMutagen.text = gameManager.countMutagen.ToString();
 
 
         /* if (player.timer)

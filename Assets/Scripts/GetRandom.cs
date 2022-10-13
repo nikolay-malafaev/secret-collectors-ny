@@ -82,5 +82,17 @@ namespace Randomize
             }
             else return false;
         }
+        
+        public static int GetRandomException(int min, int max, int exception)
+        {
+            int random = 0;
+            for (int i = 0; i < max * 10; i++)
+            {
+                random = Random.Range(min, max);
+                if(random != exception) break;
+            }
+
+            return random;
+        }
     }
 }

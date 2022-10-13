@@ -301,19 +301,6 @@ public class Player : MonoBehaviour
                     Debug.LogWarning("Game over: " + countCrash);
                 }
                 break;
-            case "Mutagen":
-                if (gameManager.buffs[1])
-                {
-                    colMutagen+=2;
-                    gameManager.AddMutagen(2);
-                }
-                else
-                {
-                    gameManager.AddMutagen(1);
-                    colMutagen++;
-                }
-                Destroy(col.gameObject);
-                break;
             case "PaulHole":
                 tabooOnMove = true;
                 camera.MoveHole();
