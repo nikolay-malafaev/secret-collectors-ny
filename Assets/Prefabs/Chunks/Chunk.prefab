@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1284262970501982257}
   - component: {fileID: 1284262970501982262}
-  - component: {fileID: 1284262970501982263}
   m_Layer: 0
   m_Name: Chunk
   m_TagString: Untagged
@@ -47,28 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7514de2aa0e4d1d438f2dbcb1e322beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Begin: {fileID: 1284262971916984978}
-  End: {fileID: 1284262972275755609}
   isDoubleChunks: 0
   doubleChunks: {fileID: 0}
-  generateMoss: {fileID: 1284262970501982263}
---- !u!114 &1284262970501982263
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1284262970501982260}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5aa6be18880ee3147bca42363a25e588, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mossPrefabs:
-  - {fileID: 7014356499688341623, guid: 02cd421de1a45e34ab00e11106aaec7a, type: 3}
-  - {fileID: 6052324209038183406, guid: ead58e7c139f646458b7e2af8f6166b4, type: 3}
-  - {fileID: 5385808488481969924, guid: 3e717c0ba3d7b074c9385daf6e95120f, type: 3}
-  milieu: {fileID: 7358579366903494498, guid: 523204a63a70c574281b2f270821e04f, type: 3}
+  generateMoss: {fileID: 0}
 --- !u!1 &1284262971916984979
 GameObject:
   m_ObjectHideFlags: 0

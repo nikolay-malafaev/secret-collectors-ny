@@ -14,7 +14,7 @@ public class PaulsController : MonoBehaviour
 {
     public Barrier[] barriersPrefabs;
     public Paul paulPrefab;
-    public GameObject barriersPool;
+    
     [HideInInspector] public Paul lastPaul;
     
     private ChunkController chunkController;
@@ -27,6 +27,7 @@ public class PaulsController : MonoBehaviour
     
     [SerializeField] private List<Paul> pauls;
 
+    [SerializeField] private GameObject barriersPool;
     [SerializeField] private Paul startPaul;
     private PoolManager poolManager;
     /// <summary>
@@ -105,7 +106,6 @@ public class PaulsController : MonoBehaviour
         if (dist < 70 && chunkController.isSpawnPermit)
         {
             GeneratePaul();
-           
         }
     }
 
@@ -114,11 +114,11 @@ public class PaulsController : MonoBehaviour
         if(pauls[0].barriers.Count > 0) DestroyBarrier(pauls[0]);
         pauls[0].transform.rotation = Quaternion.Euler(0, gameManager.ChooiseDirectionRotarion(), 0);
         pauls[0].transform.position = lastPaul.transform.position + gameManager.ChooiseDirectionPosition(0.989f);
+        pauls[0].generatorMilieu.GenerateMilieus();
         GenerateBarrier(pauls[0]); 
         lastPaul = pauls[0];
         pauls.Add(pauls[0]);
         pauls.RemoveAt(0);
-       
     }
 
     public void GenerateBarrier(Paul paul)
@@ -214,7 +214,7 @@ public class PaulsController : MonoBehaviour
         
         if (paul.countBarriers == 0)
         {
-            if (barriersPrefabs[numberBarrier].oneCountBarrier) paul.countBarriers = 1; // что есть второй barrier и он oneCount
+            if (barriersPrefabs[numberBarrier].oneCountBarrier) paul.countBarriers = 1;
             else paul.countBarriers += Random.Range(0, 2);
             minAnyTypeDistance[currenPaul] = barriersPrefabs[numberBarrier].anyTypeDistance;
             lastNumberBarrier = numberBarrier;

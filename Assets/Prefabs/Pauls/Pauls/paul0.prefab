@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2242140041844612478}
   - component: {fileID: 8406499641985578409}
-  - component: {fileID: 6685783487469559205}
+  - component: {fileID: 2542751736977380337}
   m_Layer: 0
   m_Name: paul0
   m_TagString: Untagged
@@ -59,7 +59,8 @@ MonoBehaviour:
   busyNumberBarriers: 00000000
   countBarriers: 0
   typePaul: 
---- !u!114 &6685783487469559205
+  generatorMilieu: {fileID: 2542751736977380337}
+--- !u!114 &2542751736977380337
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -72,8 +73,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   milieusPrefabs:
-  - {fileID: 6723295156618224556, guid: 897fb2692dd2d8b4195a5cbf1e3e5099, type: 3}
-  maxCountMilieus: 3
+  - {fileID: 8071461606824976207, guid: 897fb2692dd2d8b4195a5cbf1e3e5099, type: 3}
+  - {fileID: 4590856147808428294, guid: 2c489e8ba9548fe4895239fda12a06e5, type: 3}
+  maxCountMilieus: 2
+  milieus: []
 --- !u!1 &2182264995785997805
 GameObject:
   m_ObjectHideFlags: 0

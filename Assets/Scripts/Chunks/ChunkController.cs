@@ -90,6 +90,7 @@ public class ChunkController : MonoBehaviour
         chunks[0].transform.rotation = Quaternion.Euler(0, gameManager.ChooiseDirectionRotarion(), 0);
         chunks[0].transform.position = lastChunk.transform.position + gameManager.ChooiseDirectionPosition(10.35f);
         lastChunk = chunks[0];
+        //chunks[0].generateMoss.GenerateStalactites();
         chunks.Add(chunks[0]);
         chunks.RemoveAt(0);
     }

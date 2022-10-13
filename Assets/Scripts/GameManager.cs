@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public float[] globalTimeBuff;
 
     [HideInInspector] public float time;
+    [HideInInspector] public int countMutagen;
 
     [SerializeField] private ChunkController chunkController;
     [SerializeField] private BuffController buffController;
@@ -102,9 +103,10 @@ public class GameManager : MonoBehaviour
         Destroy(ntv.gameObject);
     }
 
-    public void AddMutagen(int countOneAdd)
+    public void AddMutagen(int countAdd)
     {
-        PlayerPrefs.SetInt("colMutagen", PlayerPrefs.GetInt("colMutagen") + countOneAdd);
+        countMutagen += countAdd;
+        PlayerPrefs.SetInt("colMutagen", PlayerPrefs.GetInt("colMutagen") + countAdd);
     }
 
     public void Pause()
@@ -251,7 +253,6 @@ public class GameManager : MonoBehaviour
                 y = - 90;
                 break; 
         }
-        //euler = Quaternion.Euler(0, y, 0);
         return y;
     }
 

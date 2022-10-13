@@ -86,36 +86,9 @@ public class CameraController : MonoBehaviour
     {
         
         Vector3 position = transform.position;
-        /*switch (gameManager.direction)
-        {
-            case 0:
-                transform.position = new Vector3(directionTurn, position.y, position.z);
-                break;
-            case 1:
-               // positionCamera = new Vector3(-positionCameraChange.z, positionCameraChange.y, -positionCameraFollow);
-                transform.position = new Vector3(position.x, position.y, directionTurn);
-                break;
-            case 2:
-               // positionCamera = new Vector3(-positionCameraFollow, positionCameraChange.y, positionCameraChange.z);
-               transform.position = new Vector3(directionTurn, position.y, position.z);
-                break;
-            case 3:
-                //positionCamera = new Vector3(positionCameraChange.z, positionCameraChange.y, positionCameraFollow);
-                transform.position = new Vector3(position.x, position.y, directionTurn);
-                break;
-        }*/
+       
         isFollow = false;
         transform.SetParent(player.transform);
-        
-        /*if (lastDirection == 0 || lastDirection == 2)
-        {
-           // transform.position = new Vector3(directionTurn, transform.position.y, transform.position.z);
-           transform.position = new Vector3(directionTurn, position.y, position.z);
-        }
-        else if (lastDirection == 1 || lastDirection == 3)
-        {
-            transform.position = new Vector3(position.x, position.y, -directionTurn);
-        }*/
 
         switch (lastDirection)
         {
@@ -160,8 +133,9 @@ public class CameraController : MonoBehaviour
     public void ToGame()
     {
         vetricalQuaternion = Quaternion.Euler(6.3f,0,0);
-        positionCamera = new Vector3(0, 0.54f, 1.2f);
-        RotateCameraSpeed = 65;
+        positionCameraChange.y = 0.54f;
+        positionCameraChange.z = 2.93f;
+        //RotateCameraSpeed = 65;
     }
 
     public void Rotate(float directionRotate)

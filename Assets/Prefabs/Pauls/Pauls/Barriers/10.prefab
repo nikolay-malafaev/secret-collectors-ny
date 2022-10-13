@@ -458,5 +458,7 @@ MonoBehaviour:
   sameTypeDistance: 0
   offsetBarrier: {x: 0.548, y: 0.107, z: 0}
   oneCountBarrier: 0
+  isMultiBarrier: 0
   isJob: 0
+  multiBarrier: {fileID: 0}
   possible: 1
