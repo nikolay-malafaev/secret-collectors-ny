@@ -1,195 +1,148 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
+using Randomize;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEventBus;
-
+using Random = System.Random;
 
 public class GameManager : MonoBehaviour
 {
-    public bool test;
-    public int direction;
+    [SerializeField] private bool test;
+    public bool Test
+    {
+        get { return test; }
+    }
+    private int direction;
+    public int Direction
+    {
+        get { return direction; }
+        set
+        {
+            if (value == 4) direction = 0;
+            else if (value == -1) direction = 3;
+            else direction = value;
+        }
+    }
     //     0
     //     | 
     // 3 -   - 1
     //    |
     //    2
-    [HideInInspector] public bool game;
-    [HideInInspector] public float[] globalTimeBuff;
-
-    [HideInInspector] public float time;
-    [HideInInspector] public int countMutagen;
-
+    private bool game;
+    public bool Game
+    { 
+        get { return game; }
+    }
+    private int countMutagen;
+    public int CountMutagen
+    {
+        get { return countMutagen; }
+        set { countMutagen = value >= 0 ? value : 0; }
+    }
+    private int distance;
+    public int Distance
+    {
+        get { return distance; }
+    }
     [SerializeField] private ChunkController chunkController;
-    [SerializeField] private BuffController buffController;
     [SerializeField] private Player player;
     [SerializeField] private UI UI;
-    [SerializeField] private GameObject MainSpawn;
-    [SerializeField] private GameObject light;
-    private bool timer;
-    private int numberBuff;
-    private GameObject ntv;
-
-    [SerializeField] private CameraController cameraController;
-
+    [SerializeField] private GameObject mainSpawn;
+    [SerializeField] private Light light;
     [SerializeField] private GameObject tv;
-    //number:       0         1          2       3
-    //type:    burable doubleMutagen blast  noGravity
-    //timer:    true      true       false    true
+    //number:       0          1           2         3
+    //type:    burable   doubleMutagen   blast    noGravity
+    //timer:    true        true         false      true
+    private float timeRemaining = 1;
+    private float timeBlinking = 1;
+    private bool pause;
+    
 
-    [HideInInspector] public bool[] buffs = new bool[4];
-    private float nextAction;
-    private float period;
+    public static int CurrenQualitySettings;
 
-    void Start()
+    #region Events
+
+    public static Action SendTransitionToGame;
+    public static Action SendPauseGame;
+    public static Action SendResetGame;
+    public static Action SendDefeatGame;
+    public static Action<Target.Direction> SendTurn;
+
+    #endregion
+    
+    #region Singleton
+
+    public static GameManager Instance { get; private set; }
+
+    #endregion
+    private void Awake()
     {
-        period = 1f;
-        buffs = new bool[4];
-        globalTimeBuff = new float[] {10f, 10f, 10f, 10f};
-        chunkController.pausePosition = !test;
+        Instance = this;
+    }
+    private void Start()
+    {
+        SendTransitionToGame += TransitionToGame;
+        SendTurn += Turn;
+        SendPauseGame += Pause;
+        SendDefeatGame += DefeatGame;
+        SendResetGame += ResetGame;
         game = test;
-        if (!test)
-        {
-            ntv = Instantiate(tv);
-            ntv.transform.position =
-                new Vector3(-0.845f, -0.989f, 0.139f); // Vector3(-0.845000029,-0.989000022,0.138999999)
-            ntv.transform.rotation = new Quaternion(-0.293f, 0.643f, 0.643f, 0.293f);
-        }
-
+        if (!test) StartTransform();
         direction = 0;
     }
-
     void Update()
     {
-        if (player.healthPlayer == 0)
+        if (!game && !pause)
         {
-            game = false;
-            chunkController.pausePosition = true;
-            player.healthPlayer = -1;
-            UI.GameOver();
-            player.animator.SetTrigger("fall");
+            if (timeBlinking > 0)
+            {
+                timeBlinking -= Time.deltaTime;
+            }
+            else
+            {
+                timeBlinking = UnityEngine.Random.Range(0.05f, 0.3f);
+                light.intensity = GetRandom.GetRandomInterval(UnityEngine.Random.Range(0.8f, 0.3f),
+                    UnityEngine.Random.Range(2, 2.3f));
+            }
         }
 
-
-
-        switch (direction) // сделать поворот света direction
+        if (timeRemaining > 0)
         {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
+            timeRemaining -= Time.deltaTime;
         }
-
-
-        /* if (PlayerPrefs.GetFloat($"distation") < Mathf.Abs(tubeController.positionTubeZ))
-         {
-             PlayerPrefs.SetFloat($"distation", Mathf.Round(Mathf.Abs(tubeController.positionTubeZ)));
-         }*/
+        else
+        {
+            timeRemaining = 0.25f;
+            if(game) distance++;
+        }
     }
-
-
-    public void TransitionGame()
+    private void TransitionToGame()
     {
-        cameraController.ToGame();
-        player.ToGame();
-        game = !game;
-        chunkController.pausePosition = !game;
-        Destroy(ntv.gameObject);
-    }
-
-    public void AddMutagen(int countAdd)
-    {
-        countMutagen += countAdd;
-        PlayerPrefs.SetInt("colMutagen", PlayerPrefs.GetInt("colMutagen") + countAdd);
-    }
-
-    public void Pause()
-    {
-        chunkController.pausePosition = !chunkController.pausePosition;
-        UI.Pause(chunkController.pausePosition);
-        if (Time.timeScale == 0)
-            Time.timeScale = 1;
-        else Time.timeScale = 0;
-    }
-
-    public void ResetScene()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        game = true;
         Time.timeScale = 1;
+        light.intensity = 0.5f;
+        tv.SetActive(false);
     }
-
-    public void Buffs(string nameBuff, bool isTimer)
+    private void Pause()
     {
-        int numberBuff = -1;
-        switch (nameBuff)
-        {
-            case "burable":
-                numberBuff = 0;
-                break;
-            case "doubleMutagen":
-                numberBuff = 1;
-                break;
-            case "blast":
-                numberBuff = 2;
-                buffController.Blast();
-                break;
-            case "noGravity":
-                numberBuff = 3;
-                break;
-        }
-
-
-        buffs[numberBuff] = true;
-        if (isTimer & numberBuff > -1)
-        {
-            this.numberBuff = numberBuff;
-            timer = true;
-            nextAction = 0;
-            time = 1;
-            StartCoroutine(TimeBuff(isTimer, numberBuff));
-        }
-
-        UI.BuffsUI(isTimer, timer, numberBuff);
+        game = !game;
+        pause = !pause;
+        //Time.timeScale = Time.timeScale == 0 ? 1 : 0;
     }
-
-    IEnumerator TimeBuff(bool isTimer, int number)
+    private void DefeatGame()
     {
-        yield return new WaitForSeconds(globalTimeBuff[number]);
-        timer = false;
-        buffs[number] = false;
-        UI.BuffsUI(isTimer, timer, number);
+        game = false;
     }
-
-    //Prefab
-    /*
-     *  switch (gameManager.direction)
-        {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            
-        }
-     */
-    public void Turn(Target.Direction directionTurn)
+    private void Turn(Target.Direction directionTurn)
     {
-        Transform mainSpawn = MainSpawn.transform;
+        Transform mainSpawn = this.mainSpawn.transform;
 
         if (direction == -1) direction = 3;
         if (direction == 4) direction = 0;
 
         light.transform.SetParent(player.transform);
-        StartCoroutine(timeAften(0.37f));
+        StartCoroutine(TimeAfter(0.37f));
+        
         switch (direction)
         {
             case 0:
@@ -209,11 +162,25 @@ public class GameManager : MonoBehaviour
                 mainSpawn.rotation = Quaternion.Euler(0, -90, 0);
                 break;
         }
-
-        buffController.Spawn();
     }
-
-    public Vector3 ChooiseDirectionPosition(float number)
+    private void ResetGame()
+    {
+        mainSpawn.transform.position = new Vector3(0, 0.08f, 50);
+        light.transform.position = new Vector3(0, -0.1f, -3);
+        SaveProgress();
+        direction = 0;
+        distance = 0;
+        game = false;
+        StartTransform();
+        UI.UpdateProgress();
+    }
+    private void StartTransform()
+    {
+        tv.SetActive(true);
+        tv.transform.position = new Vector3(-0.845f, -0.989f, 0.139f);
+        tv.transform.rotation = new Quaternion(-0.293f, 0.643f, 0.643f, 0.293f);
+    }
+    public Vector3 ChooseDirectionPosition(float number)
     {
          Vector3 position = new Vector3();
          switch (direction)
@@ -234,8 +201,7 @@ public class GameManager : MonoBehaviour
          }
          return position;
     }
-
-    public float ChooiseDirectionRotarion()
+    public float ChooseDirectionRotation()
     {
         float y = 0;
         switch (direction)
@@ -255,13 +221,57 @@ public class GameManager : MonoBehaviour
         }
         return y;
     }
-
-
-    IEnumerator timeAften(float time)
+    IEnumerator TimeAfter(float time)
     {
         yield return new WaitForSeconds(time);
-        chunkController.isSpawnPermit = true;
+        chunkController.IsSpawnPermit = true;
         light.transform.parent = null;
+    }
+    public void OnSendTransitionToGame()
+    {
+        SendTransitionToGame.Invoke();
+    }
+    public void OnSendPauseGame()
+    {
+        SendPauseGame.Invoke();
+    }
+    public void OnSendDefeatGame()
+    {
+        SendDefeatGame.Invoke();
+    }
+    public void OnSendResetGame()
+    {
+        SendResetGame.Invoke();
+    }
+    public void ChangeQualitySettings(int value)
+    {
+        CurrenQualitySettings = value;
+        QualitySettings.SetQualityLevel(value, true);
+        PlayerPrefs.SetInt("qualitySettings", value);
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+    private void OnApplicationQuit()
+    {
+        SaveProgress();
+    }
+    private void SaveProgress()
+    {
+        if (PlayerPrefs.GetFloat($"maxDistance") < distance)
+        {
+            PlayerPrefs.SetFloat($"maxDistance", distance);
+        }
+
+        PlayerPrefs.SetInt("countMutagen", PlayerPrefs.GetInt("countMutagen") + countMutagen);
+        countMutagen = 0;
+    }
+
+    private void OnDestroy()
+    {
+        SendTransitionToGame -= TransitionToGame;
+        SendTurn -= Turn;
+        SendPauseGame -= Pause;
+        SendDefeatGame -= DefeatGame;
+        SendResetGame -= ResetGame;
     }
 }
 

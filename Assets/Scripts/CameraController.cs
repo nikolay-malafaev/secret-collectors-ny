@@ -1,34 +1,34 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using UnityEngine;
-using Vector2 = System.Numerics.Vector2;
 
 public class CameraController : MonoBehaviour
 {
-    public Player player;
+    [SerializeField] private Player player;
+    [SerializeField] private float MovidCameraSpeed;
     private Vector3 positionCamera;
     private Vector3 verticalTargetPosition;
     private Vector3 positionCameraChange;
     private Vector3 startPositionCamera = new Vector3(1.4f,-0.32f,-1.2f);  //Vector3(1.39999998,-0.319999993,-1.29999995)
     private Quaternion startRotationCamera = Quaternion.Euler(4.9f, -50, 0);
     private float maxPositionX;
-    [SerializeField] private float MovidCameraSpeed;
     private float RotateCameraSpeed = 85;
-    [SerializeField] private GameManager gameManager;
+    private GameManager gameManager;
     private Quaternion vetricalQuaternion;
     private float positionCameraFollow;
-    [HideInInspector] public bool isFollow;
+    private bool isFollow = true;
 
 
     void Start()
     {
-        isFollow = true;
-        if (!gameManager.test)
+        gameManager = GameManager.Instance;
+        GameManager.SendTransitionToGame += TransitionToGame;
+        GameManager.SendTurn += Turn;
+        GameManager.SendResetGame += ResetGame;
+        
+        if (!gameManager.Test)
         {
-            transform.position = startPositionCamera;
-            transform.rotation = startRotationCamera;
-            positionCamera = transform.position;
+            StartTransform();
         }
         else
         {
@@ -43,8 +43,8 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
-        positionCameraFollow = Mathf.Clamp(Mathf.Sin((player.m_CurrentLane - 1) * 1.4f), -maxPositionX, maxPositionX);;
-        switch (gameManager.direction)
+        positionCameraFollow = Mathf.Clamp(Mathf.Sin((player.CurrenLane - 1) * 1.4f), -maxPositionX, maxPositionX);;
+        switch (gameManager.Direction)
         {
             case 0:
                 positionCamera = new Vector3(positionCameraFollow, positionCameraChange.y, -positionCameraChange.z);
@@ -61,7 +61,7 @@ public class CameraController : MonoBehaviour
         }
         
         
-        if (gameManager.game & isFollow)
+        if (gameManager.Game & isFollow)
         {
             verticalTargetPosition = positionCamera;
             transform.position = Vector3.MoveTowards(transform.position, verticalTargetPosition,
@@ -82,27 +82,29 @@ public class CameraController : MonoBehaviour
     }
     
 
-    public void Turn(int directionTurn, int lastDirection) //повернуть -1 (+1)
+    private void Turn(Target.Direction directionTurn) 
     {
+        int sing = directionTurn == Target.Direction.Right ? 1 : -1;
+        int last = gameManager.Direction - sing;
+        if (last == 4) last = 0;
+        else if (last == -1) last = 3;
         
         Vector3 position = transform.position;
-       
         isFollow = false;
         transform.SetParent(player.transform);
-
-        switch (lastDirection)
+        switch (last)
         {
             case 0:
-                transform.position = new Vector3(directionTurn, position.y, position.z);
+                transform.position = new Vector3(sing, position.y, position.z);
                 break;
             case 1:
-                transform.position = new Vector3(position.x, position.y, -directionTurn);
+                transform.position = new Vector3(position.x, position.y, -sing);
                 break;
             case 2:
-                transform.position = new Vector3(-directionTurn, position.y, position.z);
+                transform.position = new Vector3(-sing, position.y, position.z);
                 break;
             case 3:
-                transform.position = new Vector3(position.x, position.y, directionTurn);
+                transform.position = new Vector3(position.x, position.y, sing);
                 break;
         }
        
@@ -116,8 +118,6 @@ public class CameraController : MonoBehaviour
         {
             case "hole":
                 maxPositionX = 0.7f;
-                //positionCamera.y = 0.54f;
-                //positionCamera.z = 2.93f;
                 positionCameraChange = new Vector3(0, 0.54f, 2.93f); 
                 break;
             case "follow":
@@ -130,7 +130,7 @@ public class CameraController : MonoBehaviour
       
     }
     
-    public void ToGame()
+    private void TransitionToGame()
     {
         vetricalQuaternion = Quaternion.Euler(6.3f,0,0);
         positionCameraChange.y = 0.54f;
@@ -138,8 +138,27 @@ public class CameraController : MonoBehaviour
         //RotateCameraSpeed = 65;
     }
 
+    private void ResetGame()
+    {
+        StartTransform();
+    }
+
+    private void StartTransform()
+    {
+        transform.position = startPositionCamera;
+        transform.rotation = startRotationCamera;
+        positionCamera = transform.position;
+    }
+
     public void Rotate(float directionRotate)
     {
         vetricalQuaternion = Quaternion.Euler(0,directionRotate,0);
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.SendTransitionToGame -= TransitionToGame;
+        GameManager.SendTurn -= Turn;
+        GameManager.SendResetGame -= ResetGame;
     }
 }

@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,4 +15,5 @@ public class Paul : MonoBehaviour
     [HideInInspector] public int countBarriers;
     [HideInInspector] public string typePaul;
     public GeneratorMilieu generatorMilieu;
+    public bool notCanHaveMilieu;
 }

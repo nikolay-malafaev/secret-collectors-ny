@@ -109,6 +109,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdfb1cfeca34b68408bbb0984d078c06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buff: {fileID: 0}
   options: 3
-  player: {fileID: 0}
+  timeWork: 3

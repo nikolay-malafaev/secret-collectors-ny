@@ -1,88 +1,77 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 public class Player : MonoBehaviour
 {
-    [HideInInspector] public int healthPlayer;
-    [HideInInspector] public int colMutagen;
-    public int m_CurrentLane;
-    public float MovidPlayerSpeed;
-    public float jumpLength = 6;
-    private float m_JumpStart;
-
-    //Buffs
-    private bool burable;
-    private bool blastScreen;
-    private bool doubleMutagen;
-    private bool timer;
-    [HideInInspector] public bool IsNoGravity;
-
+    private int health = 1;
+    public int Health
+    {
+        get { return health; }
+    }
     
-    [SerializeField] private GameObject Lantern;
-    public bool m_Jumping;
-    public bool m_IsFly;
-    public Vector3 m_TargetPosition;
+    private int currentLane = 1;
+    public int CurrenLane
+    {
+        get { return currentLane; }
+    }
+
+    [SerializeField] private float movePlayerSpeed;
+    [SerializeField] private float jumpLength;
+    [SerializeField] private GameObject lantern;
+    private float jumpStart;
+    private bool jumping;
+    private bool isFly = false;
+    private Vector3 targetPosition;
     private Vector3 verticalTargetPosition;
-    public GameManager gameManager;
-    public ChunkController chunkController;
-    public CameraController camera;
-    [HideInInspector] public Quaternion vetricalQuaternion;
-    [HideInInspector] public Animator animator;
-    [HideInInspector] public int eulerCorner;
-    [HideInInspector] public float yCorner;
-    [HideInInspector] public bool isNoGravityBaff;
-    public UI UI;
+    private Quaternion verticalQuaternion;
+    private Animator animator;
     private float positionY;
-    private bool tabooOnMove;
+    private bool lockMove;
     private bool onGame;
-    
-    private bool m_IsSwiping = false;
-    private Vector2 m_StartingTouch;
-    private float lastMovidPlayerSpeed;
+    private bool isSwiping;
+    private bool isNoGravity;
+    private Vector2 startingTouch;
+    private float lastMovePlayerSpeed;
     private float countCrash;
     private int chooseAnimation;
     private Quaternion startRotation = Quaternion.Euler(0, 130, 0);
-    public bool isChange;
+    private bool isChange;
+    private GameManager gameManager;
+    private ChunkController chunkController;
+    private CameraController cameraController;
+    
 
     void Start()
     {
+        gameManager = GameManager.Instance;
+        GameManager.SendTransitionToGame += TransitionToGame;
+        GameManager.SendTurn += Turn;
+        GameManager.SendDefeatGame += DefeatGame;
+        GameManager.SendResetGame += ResetGame;
+        GameManager.SendPauseGame += Pause;
+        BuffController.SendBuff += Buff;
+        cameraController = FindObjectOfType<CameraController>();
+        chunkController = FindObjectOfType<ChunkController>();
         animator = GetComponentInChildren<Animator>();
-        lastMovidPlayerSpeed = MovidPlayerSpeed;
-        IsNoGravity = false;
+        lastMovePlayerSpeed = movePlayerSpeed;
         positionY = -1;
-        m_TargetPosition = new Vector3(0, positionY, 0);
-        healthPlayer = 1;
-        m_IsFly = false;
-        //EventManager.ChangeRoad = ChangeRoad;
+        targetPosition = new Vector3(0, positionY, 0);
 
-        if (gameManager.test)
+        if (gameManager.Test)
         {
             animator.SetTrigger("run");
         }
         else
         {
-            Lantern.SetActive(false);
-            vetricalQuaternion = startRotation;
-            transform.rotation = startRotation;
-            StartCoroutine(AnimationFun());
+            StartTransform();
         }
     }
-    
-    IEnumerator AnimationFun()
-    {
-        yield return new WaitForSeconds(5);
-        chooseAnimation = Random.Range(0, 3);
-        animator.SetInteger("choose", chooseAnimation);
-        if(!gameManager.game) StartCoroutine(AnimationFun());
-    }
-    
     
 
     void Update()
     {
+        
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
@@ -96,18 +85,13 @@ public class Player : MonoBehaviour
         {
             Jump();
         }
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-           NoGravity();
-        }
-      
+
 #else
-        
         if (Input.touchCount == 1)
         {
-            if(m_IsSwiping)
+            if(isSwiping)
             {
-                Vector2 diff = Input.GetTouch(0).position - m_StartingTouch;
+                Vector2 diff = Input.GetTouch(0).position - startingTouch;
 
                 // Put difference in Screen ratio, but using only width, so the ratio is the same on both
                 // axes (otherwise we would have to swipe more vertically...)
@@ -138,42 +122,37 @@ public class Player : MonoBehaviour
                         }
                     }
 						
-                    m_IsSwiping = false;
+                    isSwiping = false;
                 }
             }
-
-
-            // Input check is AFTER the swip test, that way if TouchPhase.Ended happen a single frame after the Began Phase
-            // a swipe can still be registered (otherwise, m_IsSwiping will be set to false and the test wouldn't happen for that began-Ended pair)
+            
             if(Input.GetTouch(0).phase == TouchPhase.Began)
             {
-                m_StartingTouch = Input.GetTouch(0).position;
-                m_IsSwiping = true;
+                startingTouch = Input.GetTouch(0).position;
+                isSwiping = true;
             }
             else if(Input.GetTouch(0).phase == TouchPhase.Ended)
             {
-                m_IsSwiping = false;
+                isSwiping = false;
             }
         }
 #endif
-        onGame = gameManager.game;
-       
-        m_TargetPosition = new Vector3(m_TargetPosition.x, positionY, m_TargetPosition.z);
         
         
-        
-        healthPlayer = Mathf.Clamp(healthPlayer, -1, 1);
-        verticalTargetPosition = m_TargetPosition;
+        onGame = gameManager.Game;
+        targetPosition = new Vector3(targetPosition.x, positionY, targetPosition.z);
+        health = Mathf.Clamp(health, -1, 1);
+        verticalTargetPosition = targetPosition;
 
-        if (m_Jumping)
+        if (jumping)
         {
             float correctJumpLength = jumpLength * (1.0f + chunkController.numberAddSpeed);
             float ratio = 0;
-            if(gameManager.direction == 0 || gameManager.direction == 2) ratio = (Mathf.Abs(chunkController.transform.position.z) - m_JumpStart) / correctJumpLength;
-            if(gameManager.direction == 1 || gameManager.direction == 3) ratio = (Mathf.Abs(chunkController.transform.position.x) - m_JumpStart) / correctJumpLength;
+            if(gameManager.Direction == 0 || gameManager.Direction == 2) ratio = (Mathf.Abs(chunkController.transform.position.z) - jumpStart) / correctJumpLength;
+            if(gameManager.Direction == 1 || gameManager.Direction == 3) ratio = (Mathf.Abs(chunkController.transform.position.x) - jumpStart) / correctJumpLength;
             if (Mathf.Abs(ratio) >= 1.5f)   // System.Math.Round(transform.position.y, 1)  > 0.23f
             {
-                m_Jumping = false;
+                jumping = false;
             }
             else
             {
@@ -183,12 +162,12 @@ public class Player : MonoBehaviour
 
         if (onGame)
         {
-            transform.position = Vector3.MoveTowards( transform.position, verticalTargetPosition, MovidPlayerSpeed * Time.deltaTime);
-            transform.rotation = Quaternion.RotateTowards( transform.rotation, vetricalQuaternion, 250 * Time.deltaTime);
+            transform.position = Vector3.MoveTowards( transform.position, verticalTargetPosition, movePlayerSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards( transform.rotation, verticalQuaternion, 250 * Time.deltaTime);
         }
        
-        if (Math.Round(transform.position.y - 0.1f, 1) > positionY) m_IsFly = true;  //-0.7
-        else m_IsFly = false;
+        if (Math.Round(transform.position.y - 0.1f, 1) > positionY) isFly = true;  //-0.7
+        else isFly = false;
 
         float x = transform.position.x;
         x = Mathf.Abs(x);
@@ -197,89 +176,52 @@ public class Player : MonoBehaviour
             isChange = true;
         }
         else isChange = false;
-
+        
     }
-    
-    private void ChangeRoad(string type, string form)
+
+    private void Jump()
     {
-        switch (type)
-            {
-                case "up":
-                    /*if (!m_IsFly & form != "rise")
-                    {
-                        if(m_CurrentLane == 2)
-                            ChangeLane(-1);
-                        else if(m_CurrentLane == 0)
-                            ChangeLane(1);
-                    }*/
-                    if (transform.position.y < -0.65f & form != "rise")
-                    {
-                        if (m_CurrentLane == 2)
-                            ChangeLane(-1);
-                        else if (m_CurrentLane == 0)
-                            ChangeLane(1);
-                    }
-                    else
-                    {
-                        positionY += 0.33f;
-                    }
+        if(isNoGravity || isFly || lockMove || !onGame) return;
 
-                    break;
-                case "down":
-                    positionY -= 0.33f;
-                    break;
-            }
-
-
-        positionY = Mathf.Clamp(positionY, -1, -0.67f);
-    }
-    
-    public void Jump()
-    {
-        if(m_IsFly || tabooOnMove || !onGame) return;
-
-        if (!m_Jumping)
+        if (!jumping)
         {
            //float correctJumpLength = jumpLength * (1.0f + chunkController.numberAddSpeed);
-           if(gameManager.direction == 0 || gameManager.direction == 2) m_JumpStart = Mathf.Abs(chunkController.transform.position.z);
-           if(gameManager.direction == 1 || gameManager.direction == 3) m_JumpStart = Mathf.Abs(chunkController.transform.position.x);
-           m_Jumping = true;
+           if(gameManager.Direction == 0 || gameManager.Direction == 2) jumpStart = Mathf.Abs(chunkController.transform.position.z);
+           if(gameManager.Direction == 1 || gameManager.Direction == 3) jumpStart = Mathf.Abs(chunkController.transform.position.x);
+           jumping = true;
            animator.SetTrigger("jump");
         }
     }
     
-    public void ChangeLane(int direction)
+    private void ChangeLane(int direction)
     {
-        if(IsNoGravity || tabooOnMove || !onGame) return;
+        if(isNoGravity || lockMove || !onGame) return;
         
-        int targetLane = m_CurrentLane + direction;
-        
-        
-        //ChangeRoad(m_CurrentLane, direction, "Change");
+        int targetLane = currentLane + direction;
         
         if (targetLane < 0 || targetLane > 2)
             return;
-        m_CurrentLane = targetLane;
+        currentLane = targetLane;
         
-        switch (gameManager.direction)
+        switch (gameManager.Direction)
         {
             case 0:
-                m_TargetPosition = new Vector3((m_CurrentLane - 1), positionY, 0);
+                targetPosition = new Vector3((currentLane - 1), positionY, 0);
                 break;
             case 1:
-                m_TargetPosition = new Vector3(0, positionY, -(m_CurrentLane - 1));
+                targetPosition = new Vector3(0, positionY, -(currentLane - 1));
                 break;
             case 2:
-                m_TargetPosition = new Vector3(-(m_CurrentLane - 1), positionY, 0);
+                targetPosition = new Vector3(-(currentLane - 1), positionY, 0);
                 break;
             case 3:
-                m_TargetPosition = new Vector3(0, positionY, (m_CurrentLane - 1));
+                targetPosition = new Vector3(0, positionY, (currentLane - 1));
                 break;
         }
         
         
-        if(direction > 0 & !m_IsFly) animator.SetTrigger("right");
-        if(direction < 0& !m_IsFly) animator.SetTrigger("left");
+        if(direction > 0 & !isFly) animator.SetTrigger("right");
+        if(direction < 0 & !isFly) animator.SetTrigger("left");
     }
 
     private void OnTriggerEnter(Collider col)
@@ -287,107 +229,123 @@ public class Player : MonoBehaviour
         switch (col.gameObject.tag)
         {
             case "Barrier":
-                if (!gameManager.test)
+                if (!gameManager.Test)
                 {
-                    if (gameManager.buffs[0])
+                    if (BuffController.CurrenBuff == global::Buff.Options.Durable)
                     {
-                        gameManager.Buffs("blast", false);
+                        BuffController.SendBlastBuff.Invoke();
+                        //col.gameObject.SetActive(false);
+                        BuffController.SendBuff.Invoke(false);
+                        //gameManager.Buffs("blast", false);
                     }
-                    else healthPlayer--;
+                    else if(health > 1)
+                    {
+                        health--;
+                    }
+                    else gameManager.OnSendDefeatGame();
                 }
-                else if (gameManager.test)
+                else
                 {
                     countCrash++;
                     Debug.LogWarning("Game over: " + countCrash);
                 }
                 break;
             case "PaulHole":
-                tabooOnMove = true;
-                camera.MoveHole();
-                break;
-            case "Road":
-                if(isChange) ChangeRoad("up", "plain");
-                if (!isChange) isChange = true;
-                break;
-            case "EndRoad": 
-                ChangeRoad("down", "rise");
-                break;
-            case "BeginRoad":
-                ChangeRoad("up", "rise");
-                break;
-            case "Change":
-                //EventManager.ChangeRoad(m_CurrentLane, "Change");
+                lockMove = true;
+                cameraController.MoveHole();
                 break;
         }
-        /* if (col.gameObject.CompareTag("Rise"))
-         {
-             StartCoroutine(MovedPlayerSpeed());
-             positionY = -0.32f;
-             //m_TargetPosition = new Vector3(transform.position.x, -0.32f, 4.31f);
- 
-         }
-         
-         if (col.gameObject.CompareTag("UndRise"))
-         {
-             StartCoroutine(MovedPlayerSpeed());
-             positionY = -0.708f;
-             //m_TargetPosition = new Vector3(transform.position.x, -0.708f, 4.31f);
-         }*/
     }
-    
-
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject.CompareTag($"PaulHole"))
         {
-            tabooOnMove = false;
-        }
-
-        if (other.gameObject.CompareTag($"Road"))
-        {
-            if(isChange) ChangeRoad("down", "plane");
+            lockMove = false;
         }
     }
-
-    public void NoGravity()
+    private void NoGravity(bool gravity)
     {
-        if(!isNoGravityBaff || tabooOnMove || !onGame) return;
-        
-        IsNoGravity = !IsNoGravity;
-        if (IsNoGravity)
+       if(lockMove || !onGame) return;
+
+       targetPosition = new Vector3(0, positionY, 0);
+       isNoGravity = !isNoGravity;
+       float eulerCorner;
+       
+        if (gravity)
         {
             eulerCorner = 180;
             positionY = 1.249f;
+            currentLane = 1;
         }
         else
         {
             eulerCorner = 0;
             positionY = -0.708f;
-            m_CurrentLane = 1;
         }
-        vetricalQuaternion = Quaternion.Euler(0, 0,eulerCorner);
-        m_TargetPosition = new Vector3(0, positionY, 0);
+        
+        verticalQuaternion = Quaternion.Euler(0, 0,eulerCorner);
     }
-
-    public void ToGame()
+    private void TransitionToGame()
     {
-        Lantern.SetActive(true);
+        lantern.SetActive(true);
         animator.SetTrigger("run");
-        vetricalQuaternion = Quaternion.Euler(0, 0, 0);
+        verticalQuaternion = Quaternion.Euler(0, 0, 0);
+    }
+    private void Buff(bool value)
+    {
+        if(BuffController.LastBuff == global::Buff.Options.NoGravity) NoGravity(false);
+    }
+    private void DefeatGame()
+    {
+        animator.SetTrigger("fall");
+    }
+    private void StartTransform()
+    {
+        animator.Rebind();
+        lantern.SetActive(false);
+        verticalQuaternion = startRotation;
+        transform.rotation = startRotation;
+        StartCoroutine(AnimationIdle());
+    }
+    private void ResetGame()
+    {
+        if(currentLane == 0) ChangeLane(-1);
+        else if (currentLane == 2) ChangeLane(1);
+        transform.position = new Vector3(0, positionY, 0);
+        currentLane = 1;
+        targetPosition = new Vector3(0, positionY, 0);
+        animator.speed = 1;
+        StartTransform();
+    }
+    private void Turn(Target.Direction directionTurn)
+    {
+        int sing = directionTurn == Target.Direction.Right ? 1 : -1;
+        verticalQuaternion = Quaternion.Euler(0, verticalQuaternion.eulerAngles.y + (90 * sing), 0);
+        ChangeLane(-sing);
+    }
+    IEnumerator AnimationIdle()
+    {
+        yield return new WaitForSeconds(5);
+        chooseAnimation = UnityEngine.Random.Range(0, 3);
+        animator.SetInteger("choose", chooseAnimation);
+        if(!gameManager.Game) StartCoroutine(AnimationIdle());
+    }
+    public void NoGravityButton()
+    {
+        NoGravity(!isNoGravity);
     }
 
-    IEnumerator Change()
+    private void Pause()
     {
-        yield return new WaitForSeconds(0.2f);
-        isChange = false;
+        animator.speed = animator.speed == 0 ? 1 : 0;
     }
-
-    /*IEnumerator MovedPlayerSpeed()
+    private void OnDestroy()
     {
-        MovidPlayerSpeed = 1.5f;
-        yield return new WaitForSeconds(0.2f);
-        Debug.Log("Stop");
-        MovidPlayerSpeed = lastMovidPlayerSpeed;
-    }*/
-
+        GameManager.SendTransitionToGame -= TransitionToGame;
+        GameManager.SendTurn -= Turn;
+        GameManager.SendPauseGame -= Pause;
+        GameManager.SendDefeatGame -= DefeatGame;
+        GameManager.SendResetGame -= ResetGame;
+        BuffController.SendBuff -= Buff;
+    }
 }

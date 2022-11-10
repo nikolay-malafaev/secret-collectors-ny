@@ -1,16 +1,15 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using Tools;
 
 public class Barrier : MonoBehaviour
 {
-    public float chance;
+    [SerializeField] private float chance;
     public int anyTypeDistance; // минимальное расстояние до Barrier любого типа
     public int sameTypeDistance; // минимальное расстояние до Barrier того же типа
     public Vector3 offsetBarrier;
     public bool oneCountBarrier;
     public bool isMultiBarrier;
+    public bool notCanHaveMilieu;
     [HideInInspector] public bool isJob;
     [HideInInspector] public MultiBarrier multiBarrier;
     

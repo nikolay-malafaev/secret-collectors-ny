@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class MultiBarrier : MonoBehaviour
+public class MultiBarrier : Barrier
 {
     [SerializeField] private GameObject[] barriers;
     private int isActiveBarrier;
