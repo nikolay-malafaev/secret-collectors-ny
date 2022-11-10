@@ -1,124 +1,207 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UI : MonoBehaviour
+public class UI : UIObjects
 {
-    [SerializeField] private Player player;
-    [SerializeField] private ChunkController chunkController;
-    [SerializeField] private GameManager gameManager; 
-    private UIObjects ui;
+    private GameManager gameManager;
     private Animator animator;
-    [SerializeField]private bool timer;
+    private float maxDistanceNumber;
+    private bool timePause;
+    private float timeRemaining;
+    private int timePauseValue;
 
+    private void Awake()
+    {
+        gameManager = FindObjectOfType<GameManager>();
+        dropdown.value = PlayerPrefs.GetInt("qualitySettings");
+        gameManager.ChangeQualitySettings(dropdown.value);
+        
+        if(!PlayerPrefs.HasKey("valueMusic")) PlayerPrefs.SetFloat("valueMusic", 10);
+        if(!PlayerPrefs.HasKey("valueSound")) PlayerPrefs.SetFloat("valueSound", 10);
+        if(!PlayerPrefs.HasKey("isMusic")) PlayerPrefs.SetInt("isMusic", 1);
+        if(!PlayerPrefs.HasKey("isSound")) PlayerPrefs.SetInt("isSound", 1);
+
+        musicSlider.value = PlayerPrefs.GetFloat("valueMusic");
+        musicToggle.isOn = PlayerPrefs.GetInt("isMusic") == 1;
+        soundSlider.value = PlayerPrefs.GetFloat("valueSound");
+        soundToggle.isOn = PlayerPrefs.GetInt("isSound") == 1;
+    }
 
     void Start()
     {
+        GameManager.SendTransitionToGame += TransitionToGame;
+        GameManager.SendDefeatGame += DefeatGame;
+        GameManager.SendResetGame += ResetGame;
+        BuffController.SendBuff += Buff;
         animator = GetComponent<Animator>();
-        ui = GetComponent<UIObjects>();
-        ui.maxDistation.text = PlayerPrefs.GetFloat($"distation").ToString();
-        ui.colMutagen.text = PlayerPrefs.GetInt($"colMutagen").ToString();
-        if (!gameManager.test)
+        UpdateProgress();
+        game.SetActive(gameManager.Test);
+        menu.SetActive(!gameManager.Test);
+        
+        
+    }
+    private void Update()
+    {
+        currentDistance.text = gameManager.Distance.ToString();
+        if (maxDistanceNumber < gameManager.Distance) maxDistance.text = "new Record";
+        currentCountMutagen.text = gameManager.CountMutagen.ToString();
+
+        if (BuffController.IsWorkBuff)
+        { 
+            timerBar.fillAmount = BuffController.Time;
+        }
+
+        if (timePause)
         {
-            bool game = gameManager.game;
-            ui.Game.SetActive(game);
-            ui.ButtonStart.SetActive(!game);
-            ui.Menu.SetActive(!game);
+            if (timeRemaining > 0)
+            {
+                timeRemaining -= Time.deltaTime;
+            }
+            else
+            {
+                timeRemaining = 1f;
+                timePauseValue--;
+                if (timePauseValue == 0)
+                {
+                    timePause = false;
+                    SendPause();
+                    pauseText.gameObject.SetActive(false);
+                }
+                pauseText.text = timePauseValue.ToString();
+            }
         }
     }
 
-    void Update()
+    private void Buff(bool value)
     {
-        ui.thisDistation.text = Mathf.Round(Mathf.Abs(chunkController.transform.position.z)).ToString();
-        ui.maxDistationInGame.text = PlayerPrefs.GetFloat($"distation").ToString();
-        ui.thisColMutagen.text = gameManager.countMutagen.ToString();
-
-
-        /* if (player.timer)
-         {
-             timerImage.SetActive(true);
-             animator.SetBool("timer", true);
-         }
-         else { timerImage.SetActive(false); animator.SetBool("timer", false); }*/
-
-        /* if (player.blastScreen)
-         { animator.SetTrigger("blast"); player.blastScreen = false; }*/
-
-        /*if(player.isNoGravityBaff) NoGravityButton.SetActive(true);
-        else NoGravityButton.SetActive(false);*/
-
-        /*if (player.doubleMutagen)
+        switch (BuffController.CurrenBuff)
         {
-            doubleMutagenImage.SetActive(true);
-        } else doubleMutagenImage.SetActive(false);*/
-
-        /*if (timer)
-        {
-            ui.timerBar.fillAmount = gameManager.time;
-        }*/
-        if (timer)
-        {
-            ui.timerBar.fillAmount = gameManager.time;
+            case global::Buff.Options.Null:
+                
+                break;
+            case global::Buff.Options.Durable:
+                durable.SetActive(true);
+                break;
+            case global::Buff.Options.DoubleMutagen:
+                doubleMutagen.SetActive(true);
+                break;
+            case global::Buff.Options.NoGravity:
+                noGravity.SetActive(true);
+                noGravityButton.SetActive(true);
+                break;
         }
-    }
-
-    public void BuffsUI(bool isTimer, bool timer, int buffNumer)
-    {
-        this.timer = timer;
-        if (isTimer)
+        timerBarParent.gameObject.SetActive(value);
+        switch (BuffController.LastBuff)
         {
-            ui.timerImage.SetActive(timer);
-            animator.SetBool("timer", timer);
-        }
-
-        switch (buffNumer)
-        {
-            case 0:
-                ui.burable.SetActive(timer);
+            case global::Buff.Options.Null:
                 break;
-            case 1:
-                ui.doubleMutagen.SetActive(timer);
+            case global::Buff.Options.Durable:
+                durable.SetActive(false);
                 break;
-            case 2:
-                animator.SetTrigger($"blast");
+            case global::Buff.Options.DoubleMutagen:
+                doubleMutagen.SetActive(false);
                 break;
-            case 3:
-                ui.noGravityButton.SetActive(timer);
-                if (!timer & player.transform.position.y > 1) player.NoGravity();
+            case global::Buff.Options.NoGravity:
+                noGravity.SetActive(false);
+                noGravityButton.SetActive(false);
                 break;
         }
     }
-
-
-    public void Pause(bool pause)
+    public void PauseText()
     {
-        ui.panel.SetActive(pause);
-        ui.ButtonPause.SetActive(!pause);
-        ui.TextPause.SetActive(pause);
+        timePause = true;
+        pauseText.text = "3";
+        timePauseValue = 3;
+        timeRemaining = 1f;
+        pausePanel.SetActive(false);
+        buttonPause.SetActive(true);
+        pauseText.gameObject.SetActive(true);
     }
-    public void GameOver()
+
+    public void Pause()
     {
-        ui.gameover.SetActive(true);
-        ui.panel.SetActive(true);
-        ui.ButtonPause.SetActive(false);
+        pausePanel.SetActive(true);
+        buttonPause.SetActive(false);
+    }
+    
+    private void SendPause()
+    {
+        gameManager.OnSendPauseGame();
+    }
+    private void DefeatGame()
+    {
+        defeatGame.SetActive(true);
+        buttonPause.SetActive(false);
     }
     public void Approval()
     {
-        ui.Approval.SetActive(!ui.Approval.activeSelf);
+        //ApprovalButton.SetActive(!ApprovalButton.activeSelf);
     }
     public void DeletePlayerPrefs()
     {
         PlayerPrefs.DeleteAll();
+        
+    }
+    private void TransitionToGame()
+    {
+        menu.SetActive(false);
+        game.SetActive(true);
+    }
+    private void ResetGame()
+    {
+        game.SetActive(false);
+        menu.SetActive(true);
+        pausePanel.SetActive(false);
+        buttonPause.SetActive(true);
+        defeatGame.SetActive(false);
+    }
+    public void UpdateProgress()
+    {
+        maxDistanceNumber = PlayerPrefs.GetFloat($"maxDistance");
+        maxDistance.text = maxDistanceNumber.ToString();
+        maxDistanceMenu.text = maxDistanceNumber.ToString();
+        countMutagen.text = PlayerPrefs.GetInt($"countMutagen").ToString();
     }
     
-    public void Transition()
+    #region Settings
+    public void CheckDropdown()
     {
-        gameManager.TransitionGame();
-        bool game = gameManager.game;
-        ui.Game.SetActive(game);
-        ui.ButtonStart.SetActive(!game);
-        ui.Menu.SetActive(!game);
+        gameManager.ChangeQualitySettings(dropdown.value);
     }
 
+    public void CheckSlider(float value, SettingManager.TypeSetting typeSetting)
+    {
+        switch (typeSetting)
+        {
+            case SettingManager.TypeSetting.Music:
+                PlayerPrefs.SetFloat("valueMusic", value);
+                break;
+            case SettingManager.TypeSetting.Sound:
+                PlayerPrefs.SetFloat("valueSound", value);
+                break;
+        }
+    }
+    public void CheckToggle(bool value, SettingManager.TypeSetting typeSetting)
+    {
+        switch (typeSetting)
+        {
+            case SettingManager.TypeSetting.Music:
+                PlayerPrefs.SetInt("isMusic", value ? 1 : 0);
+                break;
+            case SettingManager.TypeSetting.Sound:
+                PlayerPrefs.SetInt("isSound", value ? 1 : 0);
+                break;
+        }
+    }
+
+    #endregion
+    private void OnDestroy()
+    {
+        GameManager.SendTransitionToGame -= TransitionToGame;
+        GameManager.SendDefeatGame -= DefeatGame;
+        GameManager.SendResetGame -= ResetGame;
+        BuffController.SendBuff -= Buff;
+    }
 }

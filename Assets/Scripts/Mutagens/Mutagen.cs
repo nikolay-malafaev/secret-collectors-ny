@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Mutagen : MonoBehaviour
@@ -10,7 +7,8 @@ public class Mutagen : MonoBehaviour
 
     private void Start()
     {
-        gameManager = FindObjectOfType<GameManager>();
+        //gameManager = FindObjectOfType<GameManager>();
+        gameManager = GameManager.Instance;
         mutagenController = FindObjectOfType<MutagenController>();
     }
 
@@ -18,23 +16,14 @@ public class Mutagen : MonoBehaviour
     {
         if (col.gameObject.CompareTag("Barrier") || col.gameObject.CompareTag("Buff"))
         {
-            
             gameObject.SetActive(false);
             //Debug.LogError("Mutagen is hide");
         }
 
         if (col.gameObject.CompareTag("Player"))
         {
-            if (gameManager.buffs[1])
-            {
-                gameManager.countMutagen+=2;
-                gameManager.AddMutagen(2);
-            }
-            else
-            {
-                gameManager.AddMutagen(1);
-                gameManager.countMutagen++;
-            }
+            gameManager.CountMutagen++;
+            if (BuffController.CurrenBuff == Buff.Options.DoubleMutagen) gameManager.CountMutagen++;
             mutagenController.DestroyMutagen(transform);
         }
     }

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using Random = UnityEngine.Random;
+﻿using UnityEngine;
 
 public class RoadController : MonoBehaviour
 {
-    public Road[] RoadPrefabs;
+    /*public Road[] RoadPrefabs;
     public GameObject mainSpawn;
 
     private PaulsController paulsController;
@@ -52,7 +47,7 @@ public class RoadController : MonoBehaviour
     {
         if (isSpawnRoad[0])
         {
-            switch (chunkController.gameManager.direction)
+            switch (chunkController.gameManager.Direction)
             {
                 case 0:
                     if (lastRoads[0].transform.position.z < 40)
@@ -86,7 +81,7 @@ public class RoadController : MonoBehaviour
         }
         if (isSpawnRoad[1])
         {
-            switch (chunkController.gameManager.direction)
+            switch (chunkController.gameManager.Direction)
             {
                 case 0:
                     if (lastRoads[1].transform.position.z < 40)
@@ -134,7 +129,7 @@ public class RoadController : MonoBehaviour
             if(number == 1) newRoad.transform.rotation = Quaternion.Euler(-90, 180, 0);
         }
 
-        switch (chunkController.gameManager.direction)
+        /*switch (gameManager.Direction)
         {
             case 0:
                 newRoad.transform.position = lastRoads[n].transform.position + new Vector3(0, 0, 0.989f);
@@ -223,7 +218,7 @@ public class RoadController : MonoBehaviour
             dotSpawn = mainSpawn.transform.GetChild(0);
             lastRoads[n].transform.position = new Vector3(dotSpawn.position.x + 0.25f, -0.964f, dotSpawn.position.z);
         }
-        lastRoads[n].transform.rotation = Quaternion.Euler(0, chunkController.gameManager.direction * 90, 0);
+        //lastRoads[n].transform.rotation = Quaternion.Euler(0, gameManager.Direction * 90, 0);
         lenghtRoad[n] = Random.Range(12, 18);
-    }
+    }*/
 }

@@ -1,32 +1,50 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[Serializable]
 public class UIObjects : MonoBehaviour
 {
-    [Header("Text")]
-    public Text colMutagen;
-    public Text thisColMutagen;
-    public Text maxDistation;
-    public Text maxDistationInGame;
-    public Text thisDistation;
+    [Header("Main")]
+    [SerializeField] protected GameObject game;
+    [SerializeField] protected GameObject menu;
     
-    [Header("UIObjects")]
-    public GameObject Game;
-    public GameObject Menu;
-    public GameObject ButtonStart;
-    public GameObject ButtonPause;
-    public GameObject panel;
-    public GameObject TextPause;
-    public GameObject Approval;
-    public GameObject gameover;
+    [Header("Distance")]
+    [SerializeField] protected Text maxDistance;
+    [SerializeField] protected Text maxDistanceMenu;
+    [SerializeField] protected Text currentDistance;
+    
+    [Header("Mutagen")]
+    [SerializeField] protected Text countMutagen;
+    [SerializeField] protected Text currentCountMutagen;
+    
+    [Space]
+    [SerializeField] protected GameObject pausePanel;
+    [SerializeField] protected Text pauseText;
+    [Space]
+    [SerializeField] protected GameObject defeatGame;
+    [Space]
+    [SerializeField] protected GameObject buttonPause;
+    
+    [Header("Settings")]
+    [SerializeField] protected Dropdown dropdown;
+    [SerializeField] protected GameObject warningQualitySettings;
+    [SerializeField] protected Toggle musicToggle;
+    [SerializeField] protected Slider musicSlider;
+    [SerializeField] protected Toggle soundToggle;
+    [SerializeField] protected Slider soundSlider;
+    [SerializeField] protected Toggle viewFPS;
     
     [Header("Buffs")]
-    public Image timerBar;
-    public GameObject timerImage;
-    public GameObject doubleMutagen;
-    public GameObject noGravityButton;
-    public GameObject burable;
+    [SerializeField] protected GameObject durable;
+    [SerializeField] protected GameObject doubleMutagen;
+    [SerializeField] protected GameObject noGravity;
+    [Space]
+    [SerializeField] protected GameObject noGravityButton;
+    [Space]
+    [SerializeField] protected Image timerBar;
+    [SerializeField] protected GameObject timerBarParent;
+    
+    
+
 }

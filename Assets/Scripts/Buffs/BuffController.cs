@@ -1,83 +1,115 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class BuffController : MonoBehaviour
 {
+    public static Buff.Options CurrenBuff;
+    public static Buff.Options LastBuff;
+    
+    public static float Time;
+    public static bool IsWorkBuff;
+    public const float DistanceDestroyBarriers = 23;
+    
     [SerializeField] private GameObject mainSpawn;
-    public GameObject destroyerBuffs;
-    public Buff[] baffs;
+    [SerializeField] private Buff[] buffsPrefabs;
+    [SerializeField] private int distanceDestroyBuff = 3;
+    [SerializeField] private ParticleSystem blastParticleSystem;
     private Buff buffInScene;
     private GameManager gameManager;
-    private int distationDestroyBaff = 3;
-    
-    [Range(0, 100)]
-    public float[] oddsBaffs;
 
+    [Range(0, 100)]
+    [SerializeField] private float[] oddsBuffs;
+    private List<Buff> buffs = new List<Buff>();
+    private float timeRemaining;
+    private float period;
+    private float timeWorkBuff;
+    
+    public static Action<bool> SendBuff;
+    public static Action SendBlastBuff;
+    
     private void Start()
     {
-        //gameManager = FindObjectOfType<GameManager>();
-       // Spawn();
+        gameManager = GameManager.Instance;
+        GameManager.SendResetGame += ResetGame;
+        SendBuff += Buff;
+        SendBlastBuff += Blast;
+        foreach (var buff in buffsPrefabs)
+        {
+            Buff newBuff = Instantiate(buff, transform, true);
+            newBuff.gameObject.SetActive(false);
+            buffs.Add(newBuff);
+        }
+        Spawn();
     }
 
-    /*private void Update()
+    private void Update()
     {
-        if (buffInScene != null)
+        if (IsWorkBuff)
         {
-            switch (gameManager.direction)
+            if (timeRemaining > 0)
             {
-                case 0:
-                    if (buffInScene.transform.position.z < -distationDestroyBaff)
-                    {
-                        Spawn();
-                    }
-                    break;
-                case 1:
-                    if (buffInScene.transform.position.x < -distationDestroyBaff)
-                    {
-                        Spawn();
-                    }
-                    break;
-                case 2:
-                    if (buffInScene.transform.position.z > distationDestroyBaff)
-                    {
-                        Spawn();
-                    }
-                    break;
-                case 3:
-                    if (buffInScene.transform.position.x > distationDestroyBaff)
-                    {
-                        Spawn();
-                    }
-                    break;
+                timeRemaining -= UnityEngine.Time.deltaTime;
+            }
+            else
+            {
+                timeRemaining = period; 
+                Time -= 0.01f;
+                if (Time <= 0) SendBuff.Invoke(false);
             }
         }
-    }*/
-
-    public void Spawn()
-    { 
-        if (buffInScene != null) Destroy(buffInScene.gameObject);
-        int randomPointBuff = Random.Range(0, 5);
-        Buff buff = Instantiate(baffs[Mathf.RoundToInt(Choose(oddsBaffs))], transform, true);
-        buff.transform.position = mainSpawn.transform.GetChild(randomPointBuff).position;
-        buff.transform.rotation = mainSpawn.transform.rotation;
-        buffInScene = buff;
+        
+        if (buffInScene == null) return;
+        switch (gameManager.Direction)
+        {
+            case 0:
+                if (buffInScene.transform.position.z < -distanceDestroyBuff) Spawn();
+                break;
+            case 1:
+                if (buffInScene.transform.position.x < -distanceDestroyBuff) Spawn();
+                break;
+            case 2:
+                if (buffInScene.transform.position.z > distanceDestroyBuff) Spawn();
+                break;
+            case 3:
+                if (buffInScene.transform.position.x > distanceDestroyBuff) Spawn();
+                break;
+        }
     }
-
-    public void Blast()
+    private void Spawn()
     {
-        destroyerBuffs.SetActive(true);
-        StartCoroutine(BlastTime());
+        if (buffInScene != null) buffInScene.gameObject.SetActive(false);
+        
+        int randomPointBuff = UnityEngine.Random.Range(0, 5);
+        int i = Mathf.RoundToInt(Choose(oddsBuffs));
+        buffs[i].gameObject.SetActive(true);
+        buffs[i].transform.position = mainSpawn.transform.GetChild(randomPointBuff).position;
+        buffs[i].transform.rotation = mainSpawn.transform.rotation;
+        buffInScene = buffs[i];
     }
-    IEnumerator BlastTime()
+    private void Buff(bool value)
     {
-        yield return new WaitForSeconds(0.3f);
-        destroyerBuffs.SetActive(false);
+        IsWorkBuff = value;
+        if (!value)
+        {
+            LastBuff = CurrenBuff;
+            CurrenBuff = global::Buff.Options.Null;
+            return;
+        }
+        timeWorkBuff = buffs[(int)CurrenBuff - 1].TimeWork;
+        period = timeWorkBuff / 100;
+        Time = 1;
     }
 
-    float Choose(float[] probs)
+    private void Blast()
+    {
+        blastParticleSystem.Play();
+    }
+    private void ResetGame()
+    {
+        Spawn();
+    }
+    private float Choose(float[] probs)
     {
 
         float total = 0;
@@ -87,7 +119,7 @@ public class BuffController : MonoBehaviour
             total += elem;
         }
 
-        float randomPoint = Random.value * total;
+        float randomPoint = UnityEngine.Random.value * total;
 
         for (int i = 0; i < probs.Length; i++)
         {
@@ -101,5 +133,10 @@ public class BuffController : MonoBehaviour
             }
         }
         return probs.Length - 1;
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.SendResetGame -= ResetGame;
     }
 }

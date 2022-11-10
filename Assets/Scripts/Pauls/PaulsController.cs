@@ -1,32 +1,18 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Xml.Schema;
-using Unity.Mathematics;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
-using static Randomize.GetRandom;
 
 public class PaulsController : MonoBehaviour
 {
-    public Barrier[] barriersPrefabs;
+    [Header("Pauls")]
     public Paul paulPrefab;
-    
     [HideInInspector] public Paul lastPaul;
-    
     private ChunkController chunkController;
     private GameManager gameManager;
     private Player player;
     private int[] countPaulsBetween;
-
-    [Range(0, 100)] public float[] oddsBarriers;
-    private int countPauls;
-    
     [SerializeField] private List<Paul> pauls;
-
     [SerializeField] private GameObject barriersPool;
     [SerializeField] private Paul startPaul;
     private PoolManager poolManager;
@@ -39,8 +25,11 @@ public class PaulsController : MonoBehaviour
     /// </summary>
     private int[,] minSameTypeDistance;
     private int lastNumberBarrier;
-
-
+    
+    [Header("Barriers")]
+    public Barrier[] barriersPrefabs;
+    [Range(0, 100)] public float[] oddsBarriers;
+    
     private void Awake()
     {
         poolManager = FindObjectOfType<PoolManager>();
@@ -79,7 +68,9 @@ public class PaulsController : MonoBehaviour
         }
         
         player = FindObjectOfType<Player>();
-        gameManager = FindObjectOfType<GameManager>();
+        gameManager = GameManager.Instance;
+        GameManager.SendResetGame += ResetGame;
+        BuffController.SendBlastBuff += BlastBuff;
         chunkController = FindObjectOfType<ChunkController>();
        
         pauls.Add(startPaul);
@@ -91,8 +82,9 @@ public class PaulsController : MonoBehaviour
             newPaul.transform.position = lastPaul.transform.position + new Vector3(0, 0, 0.989f);
             if (i > 20)
             {
-                GenerateBarrier(newPaul); 
+                GenerateBarrier(newPaul);
             }
+            if (!newPaul.notCanHaveMilieu) newPaul.generatorMilieu.GenerateMilieus();
 
             newPaul.typePaul = "singlePaul";
             lastPaul = newPaul;
@@ -103,7 +95,7 @@ public class PaulsController : MonoBehaviour
     void Update()
     {
         float dist = Vector3.Distance(player.transform.position, lastPaul.transform.position);
-        if (dist < 70 && chunkController.isSpawnPermit)
+        if (dist < 70 && chunkController.IsSpawnPermit)
         {
             GeneratePaul();
         }
@@ -112,10 +104,14 @@ public class PaulsController : MonoBehaviour
     private void GeneratePaul()
     {
         if(pauls[0].barriers.Count > 0) DestroyBarrier(pauls[0]);
-        pauls[0].transform.rotation = Quaternion.Euler(0, gameManager.ChooiseDirectionRotarion(), 0);
-        pauls[0].transform.position = lastPaul.transform.position + gameManager.ChooiseDirectionPosition(0.989f);
-        pauls[0].generatorMilieu.GenerateMilieus();
-        GenerateBarrier(pauls[0]); 
+        pauls[0].generatorMilieu.DestroyMilieu();
+        pauls[0].transform.rotation = Quaternion.Euler(0, gameManager.ChooseDirectionRotation(), 0);
+        pauls[0].transform.position = lastPaul.transform.position + gameManager.ChooseDirectionPosition(0.989f);
+        pauls[0].notCanHaveMilieu = false;
+        if(barriersPrefabs.Length > 0) GenerateBarrier(pauls[0]);
+        if (!pauls[0].notCanHaveMilieu) pauls[0].generatorMilieu.GenerateMilieus();
+        
+        
         lastPaul = pauls[0];
         pauls.Add(pauls[0]);
         pauls.RemoveAt(0);
@@ -123,7 +119,7 @@ public class PaulsController : MonoBehaviour
 
     public void GenerateBarrier(Paul paul)
     {
-        int numberBarrier = ChoiсeBarrier(paul);
+        int numberBarrier = ChoiceBarrier(paul);
         
         if (numberBarrier < 0)
         {
@@ -174,8 +170,8 @@ public class PaulsController : MonoBehaviour
         if(barrier.isMultiBarrier) barrier.multiBarrier.SetActiveBarrier();
         paul.barriers.Add(barrier);
         paul.numberBarriersInPool.Add(numberBarrier);
-        
-        
+        if (!paul.notCanHaveMilieu) paul.notCanHaveMilieu = barrier.notCanHaveMilieu;
+
         if(paul.countBarriers < 2) GenerateBarrier(paul);
         pauls[0].countBarriers = 0;
         pauls[0].busyNumberBarriers = new[] {false, false, false, true};
@@ -183,17 +179,19 @@ public class PaulsController : MonoBehaviour
 
     public void DestroyBarrier(Paul newPaul)
     {
-        for (int i = 0; i < newPaul.barriers.Count; i++)
+        if (newPaul.barriers.Count == 0) return;
+
+        foreach (var barrier in newPaul.barriers)
         {
-            newPaul.barriers[i].transform.SetParent(barriersPool.transform);
-            newPaul.barriers[i].gameObject.SetActive(false);
-            newPaul.barriers[i].isJob = false;
-            if(newPaul.barriers[i].isMultiBarrier) newPaul.barriers[i].multiBarrier.SetUnActiveBarrier();
-            newPaul.barriers.RemoveAt(i);
+            barrier.transform.SetParent(barriersPool.transform);
+            barrier.gameObject.SetActive(false);
+            barrier.isJob = false;
+            if(barrier.isMultiBarrier) barrier.multiBarrier.SetUnActiveBarrier();
         }
+        newPaul.barriers.Clear();
     }
 
-    private int ChoiсeBarrier(Paul paul)
+    private int ChoiceBarrier(Paul paul)
     {
         int currenPaul = 0;
         int numberBarrier;
@@ -301,5 +299,50 @@ public class PaulsController : MonoBehaviour
         }
         return -1;
         //return probability.Length - 1;
+    }
+    private void ResetGame()
+    {
+        // reset  all grass
+       
+        float minDist = 10000;
+        int number = 0;
+        lastPaul.transform.position = new Vector3(0, -1.126f, -5);
+            
+        for (int i = 0; i < pauls.Count; i++)
+        {
+            DestroyBarrier(pauls[i]);
+            pauls[i].transform.position = lastPaul.transform.position + new Vector3(0, 0, 0.989f);
+            pauls[i].transform.rotation = Quaternion.Euler(0, 0, 0);
+            lastPaul = pauls[i];
+            float currenDist = Vector3.Distance(pauls[i].transform.position, player.transform.position);
+            if (currenDist < minDist)
+            {
+                minDist = currenDist;
+                number = i;
+            }
+            
+        }
+        
+        for (int i = 0; i < pauls.Count; i++)
+        {
+            if (i > number + 20)
+            {
+                GenerateBarrier(pauls[i]); 
+            }
+        }
+    }
+    private void BlastBuff()
+    {
+        foreach (var paul in pauls)
+        {
+            float distance = Vector3.Distance(paul.transform.position, player.transform.position);
+            if(distance < BuffController.DistanceDestroyBarriers)  DestroyBarrier(paul);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.SendResetGame -= ResetGame;
+        BuffController.SendBlastBuff -= BlastBuff;
     }
 }

@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Crocodile : MonoBehaviour
@@ -20,21 +19,21 @@ public class Crocodile : MonoBehaviour
     void FixedUpdate()
     {
 
-        if(player.healthPlayer == 2 & colBarrier)
+        if(player.Health == 2 & colBarrier)
         {
             bite = true;
             StartCoroutine(Bite());
             colBarrier = false;
         }
 
-        if(player.healthPlayer == 1 & !colBarrier)
+        if(player.Health == 1 & !colBarrier)
         {
             bite = true;
             StartCoroutine(Bite());
             colBarrier = true;
         }
 
-        if (player.healthPlayer <= 0)
+        if (player.Health <= 0)
         {
             animator.SetTrigger("dead");
         }

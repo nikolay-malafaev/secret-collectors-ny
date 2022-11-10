@@ -1,21 +1,21 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 public class Chunk : MonoBehaviour
 {
-    public bool isDoubleChunks;
+    [SerializeField] private bool isDoubleChunks;
+    
+    public bool IsDoubleChunks
+    {
+        get { return isDoubleChunks; }
+    }
+
     [HideInInspector] public DoubleChunks doubleChunks;
-    [HideInInspector] public GenerateMoss generateMoss;
+    [HideInInspector] public GenerateStalagmites generateStalagmites;
 
     private void Awake()
     {
         if (isDoubleChunks) doubleChunks = GetComponent<DoubleChunks>();
-        generateMoss = GetComponent<GenerateMoss>();
+        generateStalagmites = GetComponent<GenerateStalagmites>();
     }
 }
 

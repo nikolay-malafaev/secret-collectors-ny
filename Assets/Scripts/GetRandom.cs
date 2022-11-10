@@ -94,5 +94,10 @@ namespace Randomize
 
             return random;
         }
+
+        public static float GetRandomInterval(float one, float two)
+        {
+            return GetBool() ? one : two;
+        }
     }
 }

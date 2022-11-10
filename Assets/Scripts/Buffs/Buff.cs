@@ -1,49 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 
 public class Buff : MonoBehaviour
 {
-    public Buff buff;
     public Options options;
-    public Player player;
     public enum Options
     {
-        Burable = 0,
-        Blast = 1,
+        Null = 0,
+        Durable = 1,
         DoubleMutagen = 2,
         NoGravity = 3
     }
-
+    [Header("Time work buff in seconds")]
+    [SerializeField] private float timeWork;
+    public float TimeWork
+    {
+        get { return timeWork; }
+    }
+    
     private void OnTriggerEnter(Collider col)
     {
         if (col.gameObject.CompareTag("Player"))
         {
-            player = col.gameObject.GetComponent<Player>();
-            if (options == Options.Burable)
-            {
-                player.gameManager.Buffs("burable", true);
-            } else if (options == Options.Blast)
-            {
-                player.gameManager.Buffs("blast", false);
-            } else if (options == Options.DoubleMutagen)
-            {
-                player.gameManager.Buffs("doubleMutagen", true);
-            }
-            else if (options == Options.NoGravity)
-            {
-                player.gameManager.Buffs("noGravity", true);
-                player.isNoGravityBaff = true;
-            }
-            Destroy(gameObject);
+            BuffController.CurrenBuff = options;
+            BuffController.SendBuff.Invoke(true);
+            gameObject.SetActive(false);
         }
 
-        if (col.gameObject.CompareTag("Mutagen"))
+        if (col.gameObject.CompareTag("Mutagen") || col.gameObject.CompareTag("Barrier"))
         {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
-        
-        
     }
 }

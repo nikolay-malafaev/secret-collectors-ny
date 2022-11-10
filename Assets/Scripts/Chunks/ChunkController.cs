@@ -1,55 +1,55 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using Randomize;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
-using Random = UnityEngine.Random;
 using static Randomize.GetRandom;
-using Vector2 = System.Numerics.Vector2;
 
 public class ChunkController : MonoBehaviour
 {
-     [Range(0, 100)] public float oddsDoubleChunks;
-
+    [Range(0, 100)] public float oddsDoubleChunks;
     public float numberAddSpeed;
-    public float periodAddSpeed = 10;
-    public GameObject pool;
-    public AnimationCurve Chance;
-    [HideInInspector] public bool isDoubleChunksInScene;
-    [HideInInspector] public Chunk lastChunk;
-    [HideInInspector] public Player player;
-    [HideInInspector] public bool isSpawnPermit;
-    [HideInInspector] public PaulsController paulsController;
-    [HideInInspector] public List<Chunk> chunks = new List<Chunk>();
+    public Chunk lastChunk;
     [HideInInspector] public List<Chunk> doubleChunks = new List<Chunk>();
-    [HideInInspector] public bool pausePosition;
-    [HideInInspector] public GameManager gameManager;
-    [HideInInspector] public Vector3 position;
+    private PoolManager poolManager;
+    public bool isDoubleChunksInScene;
+    private Player player;
+    private bool isSpawnPermit;
 
-    [SerializeField] private Chunk[] ChunksPrefabs;
+    public bool IsSpawnPermit
+    {
+        get { return isSpawnPermit;} set { isSpawnPermit = value; } 
+    }
+
+    private PaulsController paulsController;
+    
+    [SerializeField] private AnimationCurve chance;
+    [SerializeField] private Chunk[] chunksPrefabs;
     [SerializeField] private Chunk startChunk;
 
-    private RoadController roadController;
+    public List<Chunk> chunks = new List<Chunk>();
+    private GameManager gameManager;
+    private const float periodAddSpeed = 10;
     private float nextActionTimeAddSpeed;
-    private float addSpeed;
+    private float addSpeed = 0.104f;
     private int currenDoubleChunk;
+    private Vector3 position;
+    private bool pausePosition;
 
-    void Start()
+    private void Start()
     {
-        roadController = FindObjectOfType<RoadController>();
+        gameManager = GameManager.Instance;
+        GameManager.SendPauseGame += Pause;
+        GameManager.SendTransitionToGame += TransitionToGame;
+        GameManager.SendDefeatGame += DefeatGame;
+        GameManager.SendResetGame += ResetGame;
+        poolManager = FindObjectOfType<PoolManager>();
         paulsController = GetComponentInChildren<PaulsController>();
-        addSpeed = 0.104f;
-        numberAddSpeed = 0.0005f;
-        nextActionTimeAddSpeed = 0;
+        player = FindObjectOfType<Player>();
         isSpawnPermit = true;
-        position.y = 0;
         chunks.Add(startChunk);
         lastChunk = startChunk;
         for (int i = 0; i < 9; i++)
         {
-            Chunk newChunk = Instantiate(ChunksPrefabs[0], transform, true);
+            Chunk newChunk = Instantiate(chunksPrefabs[0], transform, true);
             chunks.Add(newChunk);
             newChunk.transform.position = lastChunk.transform.position + new Vector3(0, 0, 10.35f);
             lastChunk = newChunk;
@@ -57,27 +57,30 @@ public class ChunkController : MonoBehaviour
 
         for (int i = 1; i < 3; i++)
         {
-            doubleChunks.Add(Instantiate(ChunksPrefabs[i], transform, true));
-            doubleChunks[i - 1].gameObject.transform.SetParent(pool.transform);
+            doubleChunks.Add(Instantiate(chunksPrefabs[i], transform, true));
+            doubleChunks[i - 1].gameObject.transform.SetParent(poolManager.transform);
         }
+
+        numberAddSpeed /= 10000;
+        pausePosition = !gameManager.Test;
     }
 
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         if (!pausePosition)
         {
             transform.position = new Vector3(position.x, position.y, position.z);
-            position -= gameManager.ChooiseDirectionPosition(addSpeed);
+            position -= gameManager.ChooseDirectionPosition(addSpeed);
             float dist = Vector3.Distance(player.transform.position, lastChunk.transform.position);
             if (dist < 50) // 70
             {
                 GenerateChunk();
-                if (GetChoice(Convert.ToInt32(oddsDoubleChunks)) && !isDoubleChunksInScene) GenerateDoubleChunk();
-                if (chunks[0].CompareTag("DoubleTube")) DestroyDoubleChunk();
+                if (chunks[0].IsDoubleChunks) DestroyDoubleChunk(true);
+                if (GetChoice(Convert.ToInt32(oddsDoubleChunks)) && !isDoubleChunksInScene)  GenerateDoubleChunk();
             }
         }
-
+        
         if (Time.time > nextActionTimeAddSpeed) // (period)
         {
             addSpeed += numberAddSpeed;
@@ -87,15 +90,13 @@ public class ChunkController : MonoBehaviour
 
     private void GenerateChunk()
     {
-        chunks[0].transform.rotation = Quaternion.Euler(0, gameManager.ChooiseDirectionRotarion(), 0);
-        chunks[0].transform.position = lastChunk.transform.position + gameManager.ChooiseDirectionPosition(10.35f);
+        chunks[0].transform.rotation = Quaternion.Euler(0, gameManager.ChooseDirectionRotation(), 0);
+        chunks[0].transform.position = lastChunk.transform.position + gameManager.ChooseDirectionPosition(10.35f);
         lastChunk = chunks[0];
-        //chunks[0].generateMoss.GenerateStalactites();
+        chunks[0].generateStalagmites.Generate();
         chunks.Add(chunks[0]);
         chunks.RemoveAt(0);
     }
-
-
     private void GenerateDoubleChunk()
     {
         int i = 0;
@@ -104,9 +105,9 @@ public class ChunkController : MonoBehaviour
 
         doubleChunks[i].transform.gameObject.SetActive(true);
         doubleChunks[i].transform.SetParent(transform);
-        doubleChunks[i].transform.rotation = Quaternion.Euler(0, doubleChunks[i].doubleChunks.defoltEuler + gameManager.ChooiseDirectionRotarion(), 0);
+        doubleChunks[i].transform.rotation = Quaternion.Euler(0, doubleChunks[i].doubleChunks.defaultEuler + gameManager.ChooseDirectionRotation(), 0);
         doubleChunks[i].transform.position =
-            lastChunk.transform.position + gameManager.ChooiseDirectionPosition(10.35f);
+            lastChunk.transform.position + gameManager.ChooseDirectionPosition(10.35f);
         if (Vector3.Distance(transform.position, new Vector3(0, 0, 0)) > 50000)
         {
             doubleChunks[i].doubleChunks.stop.gameObject.SetActive(true);
@@ -120,21 +121,53 @@ public class ChunkController : MonoBehaviour
             paulsController.GenerateBarrier(doubleChunks[i].doubleChunks.pauls[j]);
         }
     }
-
-
-    private void DestroyDoubleChunk()
+    private void DestroyDoubleChunk(bool delay)
     {
-        if (Vector3.Distance(player.transform.position, chunks[0].transform.position) > 90)
-        {
-            chunks[0].doubleChunks.BackToPool(0);
-        }
-        else chunks[0].doubleChunks.BackToPool(1);
+        doubleChunks[currenDoubleChunk].doubleChunks.BackToPool(delay);
+        chunks.RemoveAt(chunks.IndexOf(doubleChunks[currenDoubleChunk]));
 
-        chunks.RemoveAt(0);
-
-        for (int i = 0; i < doubleChunks[currenDoubleChunk].doubleChunks.pauls.Count; i++)
+        foreach (var pauls in doubleChunks[currenDoubleChunk].doubleChunks.pauls)
         {
-            paulsController.DestroyBarrier(doubleChunks[currenDoubleChunk].doubleChunks.pauls[i]);
+            paulsController.DestroyBarrier(pauls);
         }
+    }
+    private void TransitionToGame()
+    {
+        pausePosition = false;
+    }
+    private void Pause()
+    {
+        pausePosition = !pausePosition;
+    }
+    private void DefeatGame()
+    {
+        pausePosition = true;
+    }
+    private void ResetGame()
+    {
+        // reset all moss
+        pausePosition = true;
+        position = Vector3.zero;
+        transform.position = Vector3.zero;
+        lastChunk.transform.position = new Vector3(0, 0, -25);
+        for (int i = 0; i < chunks.Count; i++)
+        {
+            if (chunks[i].IsDoubleChunks)
+            {
+                DestroyDoubleChunk(false);
+                continue;
+            }
+
+            chunks[i].transform.position = lastChunk.transform.position + new Vector3(0, 0, 10.35f);
+            chunks[i].transform.rotation = Quaternion.Euler(0, 0, 0);
+            lastChunk = chunks[i];
+        }
+    }
+    private void OnDestroy()
+    {
+        GameManager.SendPauseGame -= Pause;
+        GameManager.SendTransitionToGame -= TransitionToGame;
+        GameManager.SendDefeatGame -= DefeatGame;
+        GameManager.SendResetGame -= ResetGame;
     }
 }
